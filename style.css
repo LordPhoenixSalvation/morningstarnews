@@ -4,23 +4,23 @@
   --hair:#c9c2b4; --red:#8c1c13; --firm:#dcd5c6;
 }
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;overflow-x:hidden}
+img{max-width:100%;height:auto}
 body{margin:0;background:var(--paper);color:var(--ink);
   font-family:Georgia,'Times New Roman',Times,serif;
   background-image:
     repeating-linear-gradient(0deg,rgba(0,0,0,.012) 0 1px,transparent 1px 3px);}
 a{color:inherit;text-decoration:none;border-bottom:1px solid var(--hair)}
 a:hover{border-bottom-color:var(--ink)}
-.page{max-width:60rem;margin:0 auto;padding:0 1rem 4rem}
+.page{max-width:60rem;margin:0 auto;padding:0 .85rem 4rem;overflow-x:clip}
 
 /* masthead */
-.masthead{border-bottom:3px double var(--rule);padding:1.1rem 0 .5rem;text-align:center;position:relative}
+.masthead{border-bottom:3px double var(--rule);padding:.85rem 0 .45rem;text-align:center;position:relative;max-width:100%}
 .masthead .dev{font-size:.58rem;letter-spacing:.34em;text-transform:uppercase;
   font-family:'Helvetica Neue',Arial,sans-serif;color:var(--dim);margin-bottom:.55rem}
 .masthead h1{margin:0;line-height:0}
 .masthead h1 a{border:0;display:block}
-.masthead .logo{display:block;width:100%;max-width:34rem;height:auto;margin:0 auto;
-  image-rendering:-webkit-optimize-contrast}
+.masthead .logo{display:block;width:100%;max-width:100%;height:auto;margin:0 auto}
 .dateline{display:flex;justify-content:space-between;gap:.5rem;align-items:center;
   border-top:1px solid var(--hair);margin-top:.5rem;padding-top:.32rem;
   font-family:'Helvetica Neue',Arial,sans-serif;font-size:.6rem;letter-spacing:.15em;
@@ -98,6 +98,15 @@ footer.site{margin-top:2.4rem;border-top:1px solid var(--hair);padding-top:.8rem
   article p{text-align:justify}
   h1.head,.deck,.byline,.kicker{column-span:all}
   article .item h3{font-size:1.1rem}
+}
+@media(max-width:27rem){
+  .page{padding-left:.7rem;padding-right:.7rem}
+  .masthead{padding:.6rem 0 .35rem}
+  .masthead .dev{font-size:.5rem;letter-spacing:.22em;margin-bottom:.4rem}
+  .dateline{font-size:.52rem;letter-spacing:.08em;gap:.3rem}
+  h1.head{font-size:1.55rem;line-height:1.08}
+  article p{font-size:.98rem;line-height:1.55;text-align:left;hyphens:none}
+  .item h3{font-size:1.05rem}
 }
 @media(max-width:34rem){
   .thumb{float:none;display:block;width:100%;max-width:none;margin:.3rem 0 .7rem}
