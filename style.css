@@ -15,11 +15,12 @@ a:hover{border-bottom-color:var(--ink)}
 
 /* masthead */
 .masthead{border-bottom:3px double var(--rule);padding:1.1rem 0 .5rem;text-align:center;position:relative}
-.masthead .dev{font-size:.62rem;letter-spacing:.28em;text-transform:uppercase;
-  font-family:'Helvetica Neue',Arial,sans-serif;color:var(--dim);margin-bottom:.35rem}
-.masthead h1{margin:0;font-size:clamp(1.75rem,7.5vw,3.6rem);line-height:.95;
-  font-weight:700;letter-spacing:-.015em;text-transform:uppercase}
-.masthead h1 a{border:0}
+.masthead .dev{font-size:.58rem;letter-spacing:.34em;text-transform:uppercase;
+  font-family:'Helvetica Neue',Arial,sans-serif;color:var(--dim);margin-bottom:.55rem}
+.masthead h1{margin:0;line-height:0}
+.masthead h1 a{border:0;display:block}
+.masthead .logo{display:block;width:100%;max-width:34rem;height:auto;margin:0 auto;
+  image-rendering:-webkit-optimize-contrast}
 .dateline{display:flex;justify-content:space-between;gap:.5rem;align-items:center;
   border-top:1px solid var(--hair);margin-top:.5rem;padding-top:.32rem;
   font-family:'Helvetica Neue',Arial,sans-serif;font-size:.6rem;letter-spacing:.15em;
@@ -98,7 +99,8 @@ footer.site{margin-top:2.4rem;border-top:1px solid var(--hair);padding-top:.8rem
   h1.head,.deck,.byline,.kicker{column-span:all}
   article .item h3{font-size:1.1rem}
 }
-@media(max-width:30rem){
-  .thumb{width:44%;max-width:170px}
+@media(max-width:34rem){
+  .thumb{float:none;display:block;width:100%;max-width:none;margin:.3rem 0 .7rem}
+  .thumb figcaption{font-size:.58rem}
   article p{font-size:1rem}
 }
