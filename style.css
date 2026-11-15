@@ -72,6 +72,12 @@ figcaption{font-family:'Helvetica Neue',Arial,sans-serif;font-size:.56rem;letter
   font-style:italic;color:var(--dim);font-size:.98rem;text-align:center}
 
 /* footer */
+.epigraph{margin:2.2rem auto 0;max-width:34rem;text-align:center;padding-top:1.1rem;
+  border-top:1px solid var(--hair)}
+.epigraph .q{display:block;font-size:2.6rem;line-height:.2;color:var(--dim);margin-bottom:.55rem}
+.epigraph p{margin:0;font-style:italic;font-size:1.02rem;line-height:1.45;text-align:center;hyphens:none}
+.epigraph p.src{margin-top:.5rem;font-style:normal;font-size:.66rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--dim)}
 footer.site{margin-top:2.4rem;border-top:1px solid var(--hair);padding-top:.8rem;
   font-family:'Helvetica Neue',Arial,sans-serif;font-size:.58rem;letter-spacing:.14em;
   text-transform:uppercase;color:var(--dim);display:flex;justify-content:space-between;
