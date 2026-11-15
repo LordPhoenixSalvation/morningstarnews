@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+  <title>Morningstar News</title>
+  <link>https://lordphoenixsalvation.github.io/morningstarnews/</link>
+  <description>UK news, Pokemon, Warhammer, Star Trek, AI, Android, macOS, Linux. Published daily.</description>
+  <language>en-gb</language>
+  <atom:link href="https://lordphoenixsalvation.github.io/morningstarnews/feed.xml" rel="self" type="application/rss+xml"/>
+  <item>
+    <title>Nvidia&#x27;s founder resigned and nobody&#x27;s sure what happens next</title>
+    <link>https://lordphoenixsalvation.github.io/morningstarnews/posts/2026-11-15.html</link>
+    <guid isPermaLink="true">https://lordphoenixsalvation.github.io/morningstarnews/posts/2026-11-15.html</guid>
+    <pubDate>Sun, 15 Nov 2026 08:00:00 +0000</pubDate>
+    <description>Afternoon. Corrections edition — every line below links to the thing I actually read.</description>
+  </item>
+</channel>
+</rss>
