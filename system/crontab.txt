@@ -1,0 +1,3 @@
+0 8 * * * /home/u10000/jobs/newsletter.sh # DAILY-NEWSLETTER
+0 9 * * 0 /home/u10000/jobs/weekly.sh # WEEKLY-PAPER
+17 * * * * /home/u10000/jobs/watch.sh # AVAILABILITY-WATCH
