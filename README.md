@@ -15,6 +15,18 @@ Every item carries a link to a source that was retrieved during that morning's r
 Nothing is written from memory. Weather, foraging, river levels and satellite passes
 are pulled from official feeds and reproduced verbatim rather than generated.
 
+## Look here first
+
+- **[system/README.md](system/README.md)** — how it's built, the rules that keep it
+  honest, and the cron schedule
+- **[system/scripts/newsletter.sh](system/scripts/newsletter.sh)** — the full daily
+  prompt, which is where the editorial standards actually live
+- **[system/scripts/publish.py](system/scripts/publish.py)** — the publisher,
+  including the repeat check
+- **[A finished edition](https://lordphoenixsalvation.github.io/morningstarnews/posts/2026-11-16.html)**
+- **[The Derbyshire Almanac](https://lordphoenixsalvation.github.io/morningstarnews/almanac.html)** —
+  sundown, moon, river levels and warnings for one county, rebuilt daily
+
 ## How it works
 
 The machinery — cron schedule, every Python script, the publisher, and the full
