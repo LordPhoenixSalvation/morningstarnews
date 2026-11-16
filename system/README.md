@@ -5,7 +5,7 @@ the prompts that drive each edition, the publisher, and the cron schedule. It is
 copy of what actually runs, synced from the live machine — see **Keeping this
 current** at the bottom.
 
-Nothing here is clever. Three cron jobs, a handful of Python scripts, and a job
+Nothing here is clever. Two cron jobs, a handful of Python scripts, and a job
 prompt that says what to do. The interesting part is the rules, not the code.
 
 ---
@@ -38,14 +38,12 @@ Three jobs:
 |---|---|---|
 | 08:00 daily | `newsletter.sh` | Researches and publishes the daily paper, emails a digest |
 | 09:00 Sunday | `weekly.sh` | The Sunday Paper — longer, weekly, kept out of the daily archive |
-| Hourly at :17 | `watch.sh` | Checks four upstream projects, emails **only** when something changes |
 
 ## The crontab
 
 ```
 0 8 * * * /home/u10000/jobs/newsletter.sh # DAILY-NEWSLETTER
 0 9 * * 0 /home/u10000/jobs/weekly.sh    # WEEKLY-PAPER
-17 * * * * /home/u10000/jobs/watch.sh    # AVAILABILITY-WATCH
 ```
 
 The daily runs at 08:00 **UTC**. The comments at the end of each line are there so
@@ -58,10 +56,8 @@ disturbing the others.
 |---|---|---|
 | `newsletter.sh` | bash | The daily prompt. Sets the vars, calls the four data scripts, hands everything to the agent |
 | `weekly.sh` | bash | The Sunday prompt. Same pattern, longer brief, no repeat check by design |
-| `watch.sh` | bash | Runs the watcher, pipes any change into a short email prompt |
 | `publish.py` | Python | Markdown → HTML, CSS, front page, archive, RSS, git push. ~750 lines |
 | `recent.py` | Python | Prints the previous edition's headlines and source URLs — what has already run |
-| `watch.py` | Python | Polls GitHub releases and a Play Store listing, writes `watch_state.json` |
 | `weather.py` | Python | BBC 3-day forecast for Derby (location 2651347) |
 | `forage.py` | Python | Today's seasonal note from the National Allotment Society |
 | `forage_guide.py` | Python | The Foraging Year — twelve monthly pages, 30-day cache |
