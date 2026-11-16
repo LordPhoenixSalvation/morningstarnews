@@ -15,7 +15,7 @@
 <meta name="twitter:image" content="https://lordphoenixsalvation.github.io/morningstarnews/assets/2026-11-16/38a74dad58.jpg">
 
 <link rel="alternate" type="application/rss+xml" title="Morningstar News" href="https://lordphoenixsalvation.github.io/morningstarnews/feed.xml">
-<link rel="stylesheet" href="https://lordphoenixsalvation.github.io/morningstarnews/style.css?v=f8bd299f">
+<link rel="stylesheet" href="https://lordphoenixsalvation.github.io/morningstarnews/style.css?v=b8cc5706">
 
 </head>
 <body>
@@ -43,9 +43,9 @@
 <div class="byline">Compiled by the Rool Machine &middot; Sources linked</div>
 <p class="deck">Milburn&#x27;s verdict lands tomorrow, the NHS revolts over zero-hours, and an AI can now pay for things.</p>
 <h2 class="sec weather" id="uk-weather">UK weather</h2>
-<div class="wx"><p>Derbyshire: Today sunny (2–7°C); Tuesday heavy rain (6–9°C);
+<div class="wx"><span id="weather-text">Derbyshire: Today sunny (2–7°C); Tuesday heavy rain (6–9°C);
 Wednesday light rain (6–9°C). <a
-href="https://www.bbc.co.uk/weather/2651347">BBC Weather, Derby</a></p></div>
+href="https://www.bbc.co.uk/weather/2651347">BBC Weather, Derby</a></span><button id="local-weather-btn" class="wxbtn" type="button">Use my location</button></div>
 <h2 class="sec" id="uk-news">UK news</h2>
 <div class="item"><p><img
 src="https://lordphoenixsalvation.github.io/morningstarnews/assets/2026-11-16/38a74dad58.jpg"
@@ -196,5 +196,34 @@ href="https://thenas.org.uk/November-Foraging">Source</a></p></div><div class="e
   <span>Every item links to a real source</span>
 </footer>
 </div>
+<script>
+(function(){
+  var btn=document.getElementById('local-weather-btn');
+  var textEl=document.getElementById('weather-text');
+  if(!btn||!textEl||!('geolocation' in navigator))return;
+  var wmo={0:'clear sky',1:'mainly clear',2:'partly cloudy',3:'overcast',45:'fog',48:'depositing rime fog',51:'light drizzle',53:'moderate drizzle',55:'dense drizzle',61:'light rain',63:'moderate rain',65:'heavy rain',71:'light snow',73:'moderate snow',75:'heavy snow',80:'rain showers',81:'moderate showers',82:'violent showers',95:'thunderstorm'};
+  function dayName(d,i){return i===0?'Today':new Date(d+'T12:00:00').toLocaleDateString('en-GB',{weekday:'long'});}
+  btn.addEventListener('click',function(){
+    btn.disabled=true;btn.textContent='Locating…';
+    navigator.geolocation.getCurrentPosition(function(pos){
+      var lat=pos.coords.latitude.toFixed(4),lon=pos.coords.longitude.toFixed(4);
+      Promise.all([
+        fetch('https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+'&daily=weather_code,temperature_2m_min,temperature_2m_max&timezone=auto&forecast_days=3').then(function(r){return r.json();}),
+        fetch('https://api.bigdatacloud.net/data/reverse-geocode-client?latitude='+lat+'&longitude='+lon+'&localityLanguage=en').then(function(r){return r.json();})
+      ]).then(function(res){
+        var wx=res[0],geo=res[1];
+        var place=geo.city||geo.locality||geo.principalSubdivision||'Your location';
+        var summary=wx.daily.time.map(function(d,i){
+          return dayName(d,i)+' '+(wmo[wx.daily.weather_code[i]]||'mixed conditions')+' ('+Math.round(wx.daily.temperature_2m_min[i])+'–'+Math.round(wx.daily.temperature_2m_max[i])+'°C)';
+        }).join('; ');
+        textEl.innerHTML=place+': '+summary+'. <a href="https://open-meteo.com/">Open-Meteo</a>';
+        btn.remove();
+      }).catch(function(){btn.disabled=false;btn.textContent='Weather unavailable — retry';});
+    },function(){
+      btn.disabled=false;btn.textContent='Location blocked — keeping Derby';
+    },{timeout:10000,maximumAge:600000});
+  });
+})();
+</script>
 </body>
 </html>

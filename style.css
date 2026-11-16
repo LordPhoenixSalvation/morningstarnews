@@ -155,3 +155,17 @@ footer.site{margin-top:2.4rem;border-top:1px solid var(--hair);padding-top:.8rem
   .thumb figcaption{font-size:.58rem}
   article p{font-size:1rem}
 }
+
+/* weather strip */
+.wx{border-top:1px solid var(--hair);border-bottom:1px solid var(--hair);
+  padding:.42rem 0;margin:0 0 1.1rem;font-family:'Helvetica Neue',Arial,sans-serif;
+  font-size:.66rem;letter-spacing:.045em;line-height:1.5;color:var(--dim);
+  display:flex;flex-wrap:wrap;align-items:baseline;gap:.55rem}
+.wx #weather-text{flex:1 1 14rem;min-width:0}
+.wx a{border-bottom-color:var(--hair)}
+.wxbtn{flex:0 0 auto;font:inherit;font-size:.58rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--dim);background:transparent;
+  border:1px solid var(--hair);padding:.26rem .5rem;cursor:pointer;
+  font-family:'Helvetica Neue',Arial,sans-serif}
+.wxbtn:hover:not(:disabled){color:var(--ink);border-color:var(--rule)}
+.wxbtn:disabled{opacity:.55;cursor:default}
