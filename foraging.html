@@ -13,7 +13,7 @@
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="alternate" type="application/rss+xml" title="Morningstar News" href="https://lordphoenixsalvation.github.io/morningstarnews/feed.xml">
-<link rel="stylesheet" href="https://lordphoenixsalvation.github.io/morningstarnews/style.css?v=f8bd299f">
+<link rel="stylesheet" href="https://lordphoenixsalvation.github.io/morningstarnews/style.css?v=0ffe21c4">
 <style>.guide{{max-width:36rem;margin:0 auto;padding:1.5rem 1rem 3rem}}
 .guide table{{width:100%;border-collapse:collapse;margin:1.2rem 0;font-size:.9rem}}
 .guide th[scope=row]{{text-align:left;font-weight:600;width:8.2rem;padding:.55rem .5rem .55rem 0;border-bottom:1px solid rgba(0,0,0,.12);vertical-align:top;font-family:var(--serif,Georgia,serif);font-size:.95rem}}
@@ -30,7 +30,7 @@
 <header class="masthead">
   <div class="dev">Est. 2026 &middot; Published daily</div>
   <h1><a href="https://lordphoenixsalvation.github.io/morningstarnews/"><img class="logo" src="https://lordphoenixsalvation.github.io/morningstarnews/assets/nameplate.png" alt="Morningstar News" width="2222" height="151" style="width:100%;max-width:100%;height:auto"></a></h1>
-  <div class="dateline"><span>No. 1</span><span class="mid">16 November 2026</span><span>Derbyshire</span></div>
+  <div class="dateline"><span>No. 2</span><span class="mid">17 November 2026</span><span>Derbyshire</span></div>
 </header>
 <nav class="menubar">
   <details class="menu">
@@ -56,7 +56,7 @@
 <p class="legend">The current month is highlighted. The arrow links to the page the names came from.</p>
 <table><tr><th scope='row'>January</th><td>Rosemary, Cattail, Horseradish <a class='src-link' href='https://foragerslog.co.uk/what-to-forage/january'>&rarr;</a></td></tr><tr><th scope='row'>February</th><td>Wild Garlic, Garlic Mustard, Rosemary <a class='src-link' href='https://foragerslog.co.uk/what-to-forage/february'>&rarr;</a></td></tr><tr><th scope='row'>March</th><td>Cleavers, Sorrel, Wild Garlic <a class='src-link' href='https://foragerslog.co.uk/what-to-forage/march'>&rarr;</a></td></tr><tr><th scope='row'>April</th><td>Cattail, Fennel, Wild Garlic <a class='src-link' href='https://foragerslog.co.uk/what-to-forage/april'>&rarr;</a></td></tr><tr><th scope='row'>May</th><td>Spearmint, Meadowsweet, Honeyberry <a class='src-link' href='https://foragerslog.co.uk/what-to-forage/may'>&rarr;</a></td></tr><tr><th scope='row'>June</th><td>Gooseberries, Chamomile, Rosemary <a class='src-link' href='https://foragerslog.co.uk/what-to-forage/june'>&rarr;</a></td></tr><tr><th scope='row'>July</th><td>Plums, Chanterelle, Blackberry <a class='src-link' href='https://foragerslog.co.uk/what-to-forage/july'>&rarr;</a></td></tr><tr><th scope='row'>August</th><td>Beefsteak Fungus, Porcini, Bay Bolete <a class='src-link' href='https://foragerslog.co.uk/what-to-forage/august'>&rarr;</a></td></tr><tr><th scope='row'>September</th><td>Golden Delicious Apple, Crab Apple, Chestnut <a class='src-link' href='https://foragerslog.co.uk/what-to-forage/september'>&rarr;</a></td></tr><tr><th scope='row'>October</th><td>Sloes, Medlar, Quince <a class='src-link' href='https://foragerslog.co.uk/what-to-forage/october'>&rarr;</a></td></tr><tr class='now'><th scope='row'>November</th><td>Rosehips, Winter Cress, Sloes <a class='src-link' href='https://thenas.org.uk/November-Foraging'>&rarr;</a></td></tr><tr><th scope='row'>December</th><td>Rosemary <a class='src-link' href='https://foragerslog.co.uk/what-to-forage/december'>&rarr;</a></td></tr></table>
 
-<p class="src">Sources: the National Allotment Society, Countryfile and Foragers Log, whichever answered for that month; names are reproduced verbatim and each month links to its source. Refreshed every 30 days, last built 2026-11-16. Nothing here is written by hand.</p>
+<p class="src">Sources: the National Allotment Society, Countryfile and Foragers Log, whichever answered for that month; names are reproduced verbatim and each month links to its source. Refreshed every 30 days, last built 2026-11-17. Nothing here is written by hand.</p>
 <p style="text-align:center;margin-top:2rem"><a href="./">&larr; Morningstar News</a> &middot; <a href="almanac.html">Derbyshire Almanac</a> &middot; <a href="radio.html">Radio &amp; Satellites</a></p>
 </main>
 </main>
@@ -64,5 +64,34 @@
   <span>Every item links to a real source</span>
 </footer>
 </div>
+<script>
+(function(){
+  var btn=document.getElementById('local-weather-btn');
+  var textEl=document.getElementById('weather-text');
+  if(!btn||!textEl||!('geolocation' in navigator))return;
+  var wmo={0:'clear sky',1:'mainly clear',2:'partly cloudy',3:'overcast',45:'fog',48:'depositing rime fog',51:'light drizzle',53:'moderate drizzle',55:'dense drizzle',61:'light rain',63:'moderate rain',65:'heavy rain',71:'light snow',73:'moderate snow',75:'heavy snow',80:'rain showers',81:'moderate showers',82:'violent showers',95:'thunderstorm'};
+  function dayName(d,i){return i===0?'Today':new Date(d+'T12:00:00').toLocaleDateString('en-GB',{weekday:'long'});}
+  btn.addEventListener('click',function(){
+    btn.disabled=true;btn.textContent='Locating…';
+    navigator.geolocation.getCurrentPosition(function(pos){
+      var lat=pos.coords.latitude.toFixed(4),lon=pos.coords.longitude.toFixed(4);
+      Promise.all([
+        fetch('https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+'&daily=weather_code,temperature_2m_min,temperature_2m_max&timezone=auto&forecast_days=3').then(function(r){return r.json();}),
+        fetch('https://api.bigdatacloud.net/data/reverse-geocode-client?latitude='+lat+'&longitude='+lon+'&localityLanguage=en').then(function(r){return r.json();})
+      ]).then(function(res){
+        var wx=res[0],geo=res[1];
+        var place=geo.city||geo.locality||geo.principalSubdivision||'Your location';
+        var summary=wx.daily.time.map(function(d,i){
+          return dayName(d,i)+' '+(wmo[wx.daily.weather_code[i]]||'mixed conditions')+' ('+Math.round(wx.daily.temperature_2m_min[i])+'–'+Math.round(wx.daily.temperature_2m_max[i])+'°C)';
+        }).join('; ');
+        textEl.innerHTML=place+': '+summary+'. <a href="https://open-meteo.com/">Open-Meteo</a>';
+        btn.remove();
+      }).catch(function(){btn.disabled=false;btn.textContent='Weather unavailable — retry';});
+    },function(){
+      btn.disabled=false;btn.textContent='Location blocked — keeping Derby';
+    },{timeout:10000,maximumAge:600000});
+  });
+})();
+</script>
 </body>
 </html>
