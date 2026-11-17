@@ -3,8 +3,15 @@
 import sys, os, re, json, subprocess, datetime, html, hashlib, shutil
 import urllib.request, urllib.parse
 
-REPO = "/home/u10000/repo/morningstarnews"
-SITE = "https://lordphoenixsalvation.github.io/morningstarnews"
+import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import config
+
+# Every path and address comes from config.sh — see config.py.
+REPO = config.REPO          # folder holding editions/ and posts/
+SITE = config.SITE_URL      # public address, no trailing slash
+PAPER = config.PAPER        # name in the masthead
+PLACE = config.PLACE        # county/region shown in the dateline
 UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"
 
 CSS = r"""
@@ -335,7 +342,7 @@ def pandoc(md):
                           input=md, capture_output=True, text=True).stdout
 
 
-QUOTES = json.load(open("/home/u10000/jobs/quotes.json", encoding="utf-8"))
+QUOTES = json.load(open(os.path.join(config.JOBS, "quotes.json"), encoding="utf-8"))
 
 
 def pick_quote(date):
@@ -444,22 +451,22 @@ def shell(title, body, datestr="", is_home=False, extra_head="", url=None):
     desc = re.sub(r'Compiled by the Rool Machine.*?Sources linked\s*', '', desc)
     desc = html.escape(desc.strip()[:180]).strip()
     og = (f'<meta property="og:type" content="article">\n'
-          f'<meta property="og:site_name" content="Morningstar News">\n'
+          f'<meta property="og:site_name" content="{html.escape(PAPER)}">\n'
           f'<meta property="og:title" content="{html.escape(title)}">\n'
           f'<meta property="og:description" content="{desc}">\n'
           f'<meta property="og:url" content="{url or SITE + chr(47)}">\n'
           f'<meta name="twitter:card" content="summary_large_image">\n' + og_img)
     nav = (f'<div class="dateline"><span>No. {len(os.listdir(REPO+"/posts")) if os.path.isdir(REPO+"/posts") else 1}</span>'
            f'<span class="mid">{html.escape(datestr)}</span>'
-           f'<span>Derbyshire</span></div>')
-    bardate = html.escape(datestr) if datestr else "Derbyshire, England"
+           f'<span>{html.escape(PLACE)}</span></div>')
+    bardate = html.escape(datestr) if datestr else html.escape(PLACE + ", England")
     return f"""<!doctype html>
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{html.escape(title)}</title>
-<meta name="description" content="Morningstar News: UK news, UK television, Pokemon, tabletop games, sci-fi and fantasy, and technology.">
+<meta name="description" content="{html.escape(PAPER)}: news, television, games, film and technology.">
 {og}
 <link rel="alternate" type="application/rss+xml" title="Morningstar News" href="{SITE}/feed.xml">
 <link rel="stylesheet" href="{SITE}/style.css?v={CSSV}">
@@ -469,14 +476,14 @@ def shell(title, body, datestr="", is_home=False, extra_head="", url=None):
 <div class="page">
 <header class="masthead">
   <div class="dev">Est. 2026 &middot; Published daily</div>
-  <h1><a href="{SITE}/"><img class="logo" src="{SITE}/assets/nameplate.png" alt="Morningstar News" width="2222" height="151" style="width:100%;max-width:100%;height:auto"></a></h1>
+  <h1><a href="{SITE}/"><img class="logo" src="{SITE}/assets/nameplate.png" alt="{html.escape(PAPER)}" width="2222" height="151" style="width:100%;max-width:100%;height:auto"></a></h1>
   {nav}
 </header>
 <nav class="menubar">
   <details class="menu">
     <summary>Sections</summary>
     <ul>
-      <li><a href="{SITE}/almanac.html">Derbyshire Almanac</a></li>
+      <li><a href="{SITE}/almanac.html">{html.escape(PLACE)} Almanac</a></li>
       <li><a href="{SITE}/radio.html">Radio &amp; Satellites</a></li>
       <li><a href="{SITE}/foraging.html">The Foraging Year</a></li>
       <li class="sep"></li>
@@ -522,7 +529,7 @@ WXJS = r"""
         btn.remove();
       }).catch(function(){btn.disabled=false;btn.textContent='Weather unavailable — retry';});
     },function(){
-      btn.disabled=false;btn.textContent='Location blocked — keeping Derby';
+      btn.disabled=false;btn.textContent='Location blocked';
     },{timeout:10000,maximumAge:600000});
   });
 })();

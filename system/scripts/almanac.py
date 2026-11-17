@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
-"""Derbyshire Almanac - all figures pulled from official sources, nothing invented."""
+"""The local almanac - all figures pulled from official sources, nothing invented."""
 import publish
 import json, urllib.request, sys, html, datetime as dt
 
-SITE = "/home/u10000/repo/morningstarnews"
-LAT, LON, PLACE = 52.9219, -1.4756, "Derby"
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import config
+
+# All three come from config.sh: where the site is built, and where you are.
+SITE = config.REPO
+LAT, LON = config.LAT, config.LON
+PLACE = config.TOWN
 
 def get(url, timeout=25):
     req = urllib.request.Request(url, headers={"User-Agent": "morningstar-almanac/1.0"})
@@ -110,17 +116,17 @@ def main():
 .quiet{{color:#666;font-style:italic}}"""
     _inner = f"""</style></head><body><main class="almanac">
 <p style="text-align:center;letter-spacing:.22em;font-size:.7rem;text-transform:uppercase;color:#666;margin-bottom:.2rem">Morningstar News</p>
-<h1 style="text-align:center;font-family:var(--serif,Georgia,serif);font-size:1.9rem;margin:.2rem 0 .1rem">Derbyshire Almanac</h1>
+<h1 style="text-align:center;font-family:var(--serif,Georgia,serif);font-size:1.9rem;margin:.2rem 0 .1rem">{html.escape(PLACE)} Almanac</h1>
 <p style="text-align:center;font-size:.85rem;color:#555;margin-top:0">{PLACE} &middot; {today} &middot; updated {stamp}</p>
 <h2>Sun &amp; Moon</h2>
 <table>{''.join(rows)}</table>
 {warn_html}
 <h2>River Derwent</h2>
-<p>Level and flow at Derby City, from Environment Agency telemetry, updated every 15 minutes. <a href="https://environment.data.gov.uk/flood-monitoring/id/stations/4085">Station 4085</a>.</p>
+<p>River level and flow from Environment Agency telemetry, updated every 15 minutes. <a href="https://environment.data.gov.uk/flood-monitoring/id/stations/4085">Station 4085</a>.</p>
 <p class="src">Sources: sunrise, sunset and lunar phase computed from the JPL DE421 ephemeris; warnings from the Met Office data feed; river data from the Environment Agency flood-monitoring API. Nothing on this page is written by hand &mdash; every figure is pulled at build time.</p>
 <p style="text-align:center;margin-top:2rem"><a href="./">&larr; Morningstar News</a> &middot; <a href="radio.html">Radio &amp; Satellites</a> &middot; <a href="foraging.html">Foraging Year</a></p>
 </main>"""
-    page = publish.frame("Derbyshire Almanac", _inner, CSS_PAGE, today)
+    page = publish.frame(f"{PLACE} Almanac", _inner, CSS_PAGE, today)
     with open(f"{SITE}/almanac.html", "w") as f:
         f.write(page)
     print("almanac written", today)

@@ -3,9 +3,14 @@
 import publish
 import urllib.request, sys, html, datetime as dt, json
 
-SITE = "/home/u10000/repo/morningstarnews"
-LAT, LON, ALT = 52.9219, -1.4756, 60.0
-GRID = "IO92"
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import config
+
+SITE = config.REPO            # where the site is built
+LAT, LON = config.LAT, config.LON
+ALT = 60.0                    # your height above sea level, metres
+GRID = config.GRID            # Maidenhead locator, config.sh
 SATS = [
     ("ISS (ZARYA)", "25544"),
     ("SO-50 (SaudiSat 1C)", "27607"),
@@ -130,7 +135,7 @@ def main():
     _inner = f"""</style></head><body><main class="radio">
 <p style="text-align:center;letter-spacing:.22em;font-size:.7rem;text-transform:uppercase;color:#666;margin-bottom:.2rem">Morningstar News</p>
 <h1 style="text-align:center;font-family:var(--serif,Georgia,serif);font-size:1.9rem;margin:.2rem 0 .1rem">Radio &amp; Satellites</h1>
-<p style="text-align:center;font-size:.85rem;color:#555;margin-top:0">Grid {GRID} &middot; Derby &middot; next 36 hours &middot; updated {stamp}</p>
+<p style="text-align:center;font-size:.85rem;color:#555;margin-top:0">Grid {GRID} &middot; {html.escape(config.TOWN)} &middot; next 36 hours &middot; updated {stamp}</p>
 
 <h2>Space weather</h2>
 <table>{wxrow}</table>
@@ -145,7 +150,7 @@ def main():
 <strong>ISS</strong>: voice on 145.800&nbsp;FM during school contacts, APRS on 145.825. Listen before you transmit.</p>
 
 <p class="src">Sources: orbital elements from CelesTrak, refreshed at build time; passes computed with Skyfield from the published TLEs (accuracy degrades over days as elements age); geomagnetic and solar indices from the NOAA Space Weather Prediction Center. Times are UTC &mdash; subtract nothing, the UK is on GMT in winter. Everything here is calculated or pulled, not written.</p>
-<p style="text-align:center;margin-top:2rem"><a href="./">&larr; Morningstar News</a> &middot; <a href="almanac.html">Derbyshire Almanac</a> &middot; <a href="foraging.html">Foraging Year</a></p>
+<p style="text-align:center;margin-top:2rem"><a href="./">&larr; Morningstar News</a> &middot; <a href="almanac.html">{html.escape(config.PLACE)} Almanac</a> &middot; <a href="foraging.html">Foraging Year</a></p>
 </main>"""
     page = publish.frame("Radio & Satellites", _inner, CSS_PAGE, today)
     with open(f"{SITE}/radio.html", "w") as f:

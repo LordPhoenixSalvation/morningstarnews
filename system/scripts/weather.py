@@ -1,10 +1,17 @@
 #!/usr/bin/env python3
-"""Pull the BBC's own forecast feed for Derby and print it as markdown.
+"""Pull the BBC's own forecast feed for your location and print it as markdown.
 Nothing is generated: every word of the forecast comes from the BBC feed."""
 import re, sys, requests
 from xml.etree import ElementTree as ET
 
-LOCATION = "2651347"            # BBC Weather location id for Derby
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import config
+
+# BBC Weather location id and place name both come from config.sh.
+LOCATION = config.BBC_ID
+PLACE_NAME = config.PLACE
+TOWN_NAME = config.TOWN
 PAGE = f"https://www.bbc.co.uk/weather/{LOCATION}"
 FEED = f"https://weather-broker-cdn.api.bbci.co.uk/en/forecast/rss/3day/{LOCATION}"
 UA = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
@@ -43,8 +50,8 @@ def main():
 
     print("## UK weather")
     print()
-    print(f"Derbyshire: {'; '.join(parts)}. "
-          f"[BBC Weather, Derby]({PAGE})")
+    print(f"{PLACE_NAME}: {'; '.join(parts)}. "
+          f"[BBC Weather, {TOWN_NAME}]({PAGE})")
     return 0
 
 if __name__ == "__main__":

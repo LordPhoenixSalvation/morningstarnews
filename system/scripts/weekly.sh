@@ -1,9 +1,28 @@
 #!/bin/bash
-rool-llm say /agents/rool/conversations/<conversation-id> "SUNDAY PAPER: Produce this week's Sunday Paper and publish it to the website. This is the weekend edition of Morningstar News - a longer, unhurried read than the daily, not a bigger daily. It is one edition per week.
+# ============================================================================
+#  weekly.sh — the Sunday Paper, 09:00 on Sundays
+# ============================================================================
+#  Same pattern as newsletter.sh: one long instruction to the AI, settings
+#  from config.sh, placeholders swapped at the bottom.
+#
+#  Two differences from the daily, both deliberate:
+#   - It reads the week's seven daily editions first and builds from them,
+#     so the Sunday paper is a record of what actually happened, not a fresh
+#     guess at the news.
+#   - No repeat check when publishing. A weekly is expected to revisit the
+#     week's stories; the publisher's check is for the dailies.
+# ============================================================================
 
-STAGE 1 - GATHER THE WEEK. Read the last seven daily editions in /home/u10000/repo/morningstarnews/editions/ (the seven most recent YYYY-MM-DD.md files, not the -weekly ones). Those are your record of what actually happened this week - do not invent stories that were not in them, and do not repeat them verbatim either. Then search the web for the week's genuinely significant UK news that the dailies may have missed, and for one or two things that developed after a daily ran (a follow-up, a correction, a consequence), and include any Derbyshire story from the week that mattered beyond the county line or was under-reported locally (from BBC News Derby/Derbyshire, the Derby Telegraph or Derbyshire Live, with a real retrieved link).
+set -euo pipefail
+cd "$(dirname "$0")"
+source ./config.sh
 
-STAGE 2 - WRITE IT. Write to /home/u10000/repo/morningstarnews/editions/\$(date -u +%F)-weekly.md with a heredoc. Shape:
+read -r -d '' RAW_PROMPT <<'PROMPT' || true
+SUNDAY PAPER: Produce this week's Sunday Paper and publish it to the website. This is the weekend edition of {{PAPER}} - a longer, unhurried read than the daily, not a bigger daily. It is one edition per week.
+
+STAGE 1 - GATHER THE WEEK. Read the last seven daily editions in {{REPO}}/editions/ (the seven most recent YYYY-MM-DD.md files, not the -weekly ones). Those are your record of what actually happened this week - do not invent stories that were not in them, and do not repeat them verbatim either. Then search the web for the week's genuinely significant UK news that the dailies may have missed, and for one or two things that developed after a daily ran (a follow-up, a correction, a consequence), and include any {{PLACE}} story from the week that mattered beyond the county line or was under-reported locally (from BBC News {{TOWN}}/{{PLACE}}, the {{TOWN}} Telegraph or {{PLACE}} Live, with a real retrieved link).
+
+STAGE 2 - WRITE IT. Write to {{REPO}}/editions/$(date -u +%F)-weekly.md with a heredoc. Shape:
 - H1: the single biggest story of the week as a headline, no date in it.
 - One plain standfirst line saying what kind of week it was.
 - '## The week in brief' - six to ten one-line entries, each a real story from the week with a [source](url), in the style of a serious paper's week-in-review column.
@@ -13,8 +32,20 @@ STAGE 2 - WRITE IT. Write to /home/u10000/repo/morningstarnews/editions/\$(date 
 - A closing observation of two or three sentences, longer and more reflective than the daily's one-liner.
 Tone: the same dry British newspaper voice as the daily, but with room to breathe - proper sentences, developed argument, no bullet-point padding. Every factual claim from outside the dailies needs a real retrieved source link. If you have not verified it, leave it out. Put {{xkcd:NUMBER}} on its own line about a third of the way in if a comic genuinely fits.
 
-STAGE 3 - QUOTE, WEATHER, FORAGING. Run python3 /home/u10000/jobs/weather.py and insert its output verbatim after the standfirst if it prints. Run python3 /home/u10000/jobs/forage.py and insert verbatim at the very end if it prints. Never write either yourself.
+STAGE 3 - QUOTE, WEATHER, FORAGING. Run python3 {{JOBS}}/weather.py and insert its output verbatim after the standfirst if it prints. Run python3 {{JOBS}}/forage.py and insert verbatim at the very end if it prints. Never write either yourself.
 
-STAGE 4 - PUBLISH. Run: cd /home/u10000/repo/morningstarnews && python3 /home/u10000/jobs/publish.py \$(date -u +%F)-weekly and confirm it prints the published URL. It will also put a 'Sunday Paper' link at the top of the front page and in the archive. Do not let the weekly replace the front page's daily edition.
+STAGE 4 - PUBLISH. Run: cd {{REPO}} && python3 {{JOBS}}/publish.py $(date -u +%F)-weekly and confirm it prints the published URL. It will also put a 'Sunday Paper' link at the top of the front page and in the archive. Do not let the weekly replace the front page's daily edition.
 
-STAGE 5 - EMAIL. Send one email to you@example.com with subject 'Morningstar News - The Sunday Paper - <week's headline short>'. Body: three or four lines only - the week's headline, the one detail that matters most, and a link to https://lordphoenixsalvation.github.io/morningstarnews/posts/\$(date -u +%F)-weekly.html . It is a pointer, not a copy. Send one email, then stop."
+STAGE 5 - EMAIL. Send one email to {{EMAIL}} with subject '{{PAPER}} - The Sunday Paper - <week's headline short>'. Body: three or four lines only - the week's headline, the one detail that matters most, and a link to {{SITE}}/posts/$(date -u +%F)-weekly.html . It is a pointer, not a copy. Send one email, then stop.
+PROMPT
+
+PROMPT_TEXT="${RAW_PROMPT}"
+PROMPT_TEXT="${PROMPT_TEXT//'{{JOBS}}'/$JOBS_DIR}"
+PROMPT_TEXT="${PROMPT_TEXT//'{{REPO}}'/$REPO_DIR}"
+PROMPT_TEXT="${PROMPT_TEXT//'{{SITE}}'/$SITE_URL}"
+PROMPT_TEXT="${PROMPT_TEXT//'{{EMAIL}}'/$EMAIL_TO}"
+PROMPT_TEXT="${PROMPT_TEXT//'{{PLACE}}'/$PLACE_NAME}"
+PROMPT_TEXT="${PROMPT_TEXT//'{{TOWN}}'/$PLACE_TOWN}"
+PROMPT_TEXT="${PROMPT_TEXT//'{{PAPER}}'/$PAPER_NAME}"
+
+exec "$JOBS_DIR/run_agent.sh" "$PROMPT_TEXT"

@@ -7,8 +7,9 @@ import json, os, sys, datetime, html
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from forage import sources, harvest
 
-SITE = "/home/u10000/repo/morningstarnews"
-CACHE = "/home/u10000/jobs/forage_cache.json"
+import config
+SITE = config.REPO                                  # where the site is built
+CACHE = os.path.join(config.JOBS, "forage_cache.json")  # 30-day cache
 MONTHS = ["January","February","March","April","May","June","July",
           "August","September","October","November","December"]
 
@@ -88,7 +89,7 @@ def main():
 <table>{''.join(rows)}</table>
 
 <p class="src">Sources: the National Allotment Society, Countryfile and Foragers Log, whichever answered for that month; names are reproduced verbatim and each month links to its source. Refreshed every 30 days, last built {stamp}. Nothing here is written by hand.</p>
-<p style="text-align:center;margin-top:2rem"><a href="./">&larr; Morningstar News</a> &middot; <a href="almanac.html">Derbyshire Almanac</a> &middot; <a href="radio.html">Radio &amp; Satellites</a></p>
+<p style="text-align:center;margin-top:2rem"><a href="./">&larr; {html.escape(config.PAPER)}</a> &middot; <a href="almanac.html">{html.escape(config.PLACE)} Almanac</a> &middot; <a href="radio.html">Radio &amp; Satellites</a></p>
 </main>"""
     page = publish.frame("The Foraging Year", _inner, CSS_PAGE, "%d %s %d" % (datetime.date.today().day, datetime.date.today().strftime("%B"), datetime.date.today().year))
     open(f"{SITE}/foraging.html", "w").write(page)

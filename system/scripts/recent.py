@@ -7,7 +7,10 @@ Output: for each edition, the headline of every item and the source URL it used.
 import re, sys, glob, os
 from datetime import date, timedelta
 
-REPO = "/home/u10000/repo/morningstarnews"
+import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import config
+REPO = config.REPO   # folder holding editions/, set in config.sh
 # Links that legitimately recur every day - never treat as repeats.
 RECURRING = ("bbc.co.uk/weather", "thenas.org.uk/", "foragers")
 
