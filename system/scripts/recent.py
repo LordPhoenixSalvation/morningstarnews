@@ -15,9 +15,13 @@ REPO = config.REPO   # folder holding editions/, set in config.sh
 RECURRING = ("bbc.co.uk/weather", "thenas.org.uk/", "foragers")
 
 def norm(u):
+    """Ignore the difference between http/https, trailing slashes and tracking
+    parameters, so the same article is recognised however it was linked."""
     return u.rstrip("/").split("?")[0].lower()
 
 def main():
+    """Print the previous edition's headlines and source URLs. The prompt tells
+    the AI to read this before searching."""
     n = int(sys.argv[1]) if len(sys.argv) > 1 else 1
     today = date.today()
     cands = sorted((f for f in glob.glob(os.path.join(REPO, "editions/*.md"))

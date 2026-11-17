@@ -14,6 +14,8 @@ MONTHS = ["January","February","March","April","May","June","July",
           "August","September","October","November","December"]
 
 def load_cache():
+    """Read the 30-day cache of species pages. Fetching twelve months of pages
+    on every run would be rude to the source, so results are reused."""
     try:
         d = json.load(open(CACHE))
         if (datetime.date.today() - datetime.date.fromisoformat(d["_built"])).days < 30:
@@ -23,6 +25,7 @@ def load_cache():
     return {"_built": datetime.date.today().isoformat()}
 
 def main():
+    """Build foraging.html."""
     cache = load_cache()
     for m in MONTHS:
         if m in cache and cache[m].get("species"):

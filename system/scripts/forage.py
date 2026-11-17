@@ -18,12 +18,15 @@ STOP = {"the", "our", "your", "where", "how", "what", "why", "when", "this", "th
         "and", "with", "from", "for", "how to", "find", "top", "best"}
 
 def sources(month):
+    """The source pages for a given month."""
     m = month.capitalize()
     return [f"https://thenas.org.uk/{m}-Foraging",
             f"https://www.countryfile.com/how-to/foraging/foraging-in-{month.lower()}",
             f"https://foragerslog.co.uk/what-to-forage/{month.lower()}"]
 
 def species_of(text):
+    """Pull species names out of a page as written (common name plus Latin).
+    Nothing is identified by us — only copied."""
     text = NUM.sub("", text).strip()
     m = PAIR_PAREN.match(text) or PAIR_BARE.match(text)
     if not m:
@@ -56,6 +59,7 @@ def species_of(text):
     return name, latin
 
 def harvest(url):
+    """Fetch and parse one page into a list of species names."""
     r = requests.get(url, headers=UA, timeout=30)
     if r.status_code != 200:
         return None
@@ -91,6 +95,7 @@ def harvest(url):
     return picks[:LIMIT] or None
 
 def main():
+    """Print this month's foraging line and its source link."""
     month = datetime.date.today().strftime("%B")
     for url in sources(month):
         try:

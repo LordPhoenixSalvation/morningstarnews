@@ -193,6 +193,8 @@ footer.site{margin-top:2.4rem;border-top:1px solid var(--hair);padding-top:.8rem
 
 
 def fetch(url, timeout=15):
+    """Download a URL and return the HTML as text. Returns "" on any failure,
+    because a missing image must never stop the paper going out."""
     req = urllib.request.Request(url, headers={
         "User-Agent": UA, "Accept": "text/html,application/xhtml+xml", "Accept-Language": "en-GB,en;q=0.9"})
     with urllib.request.urlopen(req, timeout=timeout) as r:
@@ -200,6 +202,8 @@ def fetch(url, timeout=15):
 
 
 def og_image(url):
+    """Find the picture to use for an item: its og:image, or the first
+    reasonably large <img> on the page. Returns None if there is nothing suitable."""
     """Return absolute og:image URL for a page, or None."""
     try:
         raw, ctype = fetch(url)
@@ -218,6 +222,8 @@ def og_image(url):
 
 
 def download_image(img_url, date, idx):
+    """Save one item image into assets/<date>/ under a short hash of its URL,
+    so the same picture is never stored twice."""
     """Download, downscale, save. Returns relative path or None."""
     try:
         raw, ctype = fetch(img_url, timeout=20)
@@ -241,6 +247,8 @@ def download_image(img_url, date, idx):
 
 
 def xkcd_comic(num, date):
+    """Download an xkcd comic for {{xkcd:N}} and return its local filename.
+    The comic is placed by the author at section boundaries; see build_body."""
     """Fetch an xkcd by number; download the image. Returns dict or None."""
     try:
         raw, _ = fetch(f"https://xkcd.com/{int(num)}/info.0.json", timeout=15)
@@ -268,10 +276,14 @@ def xkcd_comic(num, date):
 
 
 def slug(t):
+    """Turn a section heading into the anchor used in links: "UK news" -> "uk-news"."""
     return re.sub(r'[^a-z0-9]+', '-', t.lower()).strip('-')
 
 
 def drop_empty_sections(md):
+    """Remove any section heading with no items beneath it, so the paper
+    never shows an empty section. The prompt tells the AI to omit them, this
+    makes sure it actually did."""
     """Remove any ## section whose paragraphs contain no external link."""
     parts = re.split(r'(?m)^(##\s+.+)$', md)
     out = [parts[0]]
@@ -287,6 +299,9 @@ def drop_empty_sections(md):
 
 
 def para_items(md, date):
+    """Parse the markdown into sections and items: for each item, its headline,
+    body text, source link and the section it belongs to. This is the parse
+    everything downstream depends on."""
     """Split body into blocks; attach images to paragraphs that contain links."""
     blocks = re.split(r'\n\s*\n', md)
     out = []
@@ -338,6 +353,8 @@ def para_items(md, date):
 
 
 def pandoc(md):
+    """Convert the markdown body to HTML using pandoc. Raises if pandoc is not
+    installed, which is the most common setup mistake."""
     return subprocess.run(["pandoc", "-f", "markdown+link_attributes", "-t", "html"],
                           input=md, capture_output=True, text=True).stdout
 
@@ -346,6 +363,8 @@ QUOTES = json.load(open(os.path.join(config.JOBS, "quotes.json"), encoding="utf-
 
 
 def pick_quote(date):
+    """Choose the closing quote. It is seeded by the date, so the same day always
+    gets the same quote and different days get different ones."""
     """Deterministic per-edition rotation, so a re-publish never changes the quote."""
     try:
         day = datetime.date.fromisoformat(date).toordinal()
@@ -355,6 +374,7 @@ def pick_quote(date):
 
 
 def epigraph(date):
+    """Wrap the quote in the blockquote markup the stylesheet expects."""
     q = pick_quote(date)
     return ('<div class="epigraph"><span class="q" aria-hidden="true">&ldquo;</span>'
             f'<p>{html.escape(q["text"])}</p>'
@@ -362,6 +382,8 @@ def epigraph(date):
 
 
 def build_body(md, date):
+    """Assemble the article HTML: standfirst, sections, items, images, the xkcd
+    comic at the midpoint, and the closing quote."""
     md = drop_empty_sections(md)
     xk = re.search(r'\{\{xkcd:(\d+)\}\}', md)
     xkcd_html = ""
@@ -441,6 +463,8 @@ def build_body(md, date):
 
 
 def shell(title, body, datestr="", is_home=False, extra_head="", url=None):
+    """Wrap a page in the shared furniture: <head>, masthead, dropdown menu bar,
+    dateline and footer. Every page on the site goes through here."""
     og_img = ""
     m = re.search(r'src="(' + re.escape(SITE) + r'/assets/[^"]+)"', body)
     if m:
@@ -539,12 +563,15 @@ CSSV = hashlib.sha1(CSS.encode()).hexdigest()[:8]
 
 
 def frame(title, inner, extra_css="", datestr=""):
+    """A lighter wrapper for the reference pages (almanac, radio, foraging),
+    which share the masthead but none of the article layout."""
     """Wrap a reference page in the shared masthead, menu bar and footer."""
     return shell(title, inner, datestr=datestr,
                  extra_head=(f"<style>{extra_css}</style>" if extra_css else ""))
 
 
 def pretty_date(d):
+    """Turn 2026-11-16 into "Monday, 16 November 2026" for display."""
     try:
         return datetime.date.fromisoformat(d).strftime("%A, %-d %B %Y").upper()
     except Exception:
@@ -552,6 +579,7 @@ def pretty_date(d):
 
 
 def title_of(path):
+    """Read the H1 out of an edition markdown file — used for the archive."""
     try:
         md = open(path, encoding="utf-8").read()
         m = re.search(r'^#\s+(.+)$', md, re.M)
@@ -561,6 +589,7 @@ def title_of(path):
 
 
 def published_editions():
+    """Every daily edition on disk, newest first."""
     d = f"{REPO}/editions"
     if not os.path.isdir(d):
         return []
@@ -569,6 +598,8 @@ def published_editions():
 
 
 def published_weeklies():
+    """Every Sunday Paper on disk, newest first. Kept separate so the weekly
+    never appears in the daily archive."""
     d = f"{REPO}/editions"
     if not os.path.isdir(d):
         return []
@@ -577,6 +608,12 @@ def published_weeklies():
 
 
 def check_repeats(md, date):
+    """THE REPEAT CHECK. Compare every source URL in this edition against the
+    previous edition. A shared URL means the same story ran twice; the caller
+    treats that as a hard failure and the paper does not publish.
+
+    Weather and foraging links are exempt: the scripts print those daily and
+    they are expected to recur."""
     """Flag items whose source URL already ran in the previous edition. Warns, never blocks."""
     import glob as _glob
     recurring = ("bbc.co.uk/weather", "thenas.org.uk/", "foragers")
@@ -614,6 +651,9 @@ def check_repeats(md, date):
 
 
 def main():
+    """Entry point. Build the article, rebuild the front page, archive, RSS and
+    reference pages, then commit and push. Exits non-zero on failure so cron
+    and the caller can tell."""
     date = sys.argv[1] if len(sys.argv) > 1 else datetime.date.today().isoformat()
     weekly = date.endswith("-weekly")
     if weekly:

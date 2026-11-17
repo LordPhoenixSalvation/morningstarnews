@@ -13,11 +13,16 @@ LAT, LON = config.LAT, config.LON
 PLACE = config.TOWN
 
 def get(url, timeout=25):
+    """Fetch a URL and return its text. All the almanac's numbers come from
+    official sources, so every call here is to Met Office, Environment Agency
+    or astronomy data."""
     req = urllib.request.Request(url, headers={"User-Agent": "morningstar-almanac/1.0"})
     with urllib.request.urlopen(req, timeout=timeout) as r:
         return r.read().decode("utf-8", "replace")
 
 def sun_moon():
+    """Sunrise, sunset and moon phase from the machine's own clock and
+    your latitude/longitude. No API call — the maths is deterministic."""
     from skyfield.api import load
     from skyfield import almanac
     from skyfield.api import wgs84
@@ -39,6 +44,7 @@ def sun_moon():
     return rise, set_, phase.degrees, illum
 
 def met_office():
+    """Weather warnings for the region, from the Met Office feed."""
     try:
         xml = get("https://www.metoffice.gov.uk/public/data/PWSCache/WarningsRSS/Region/em.xml")
         import re
@@ -58,6 +64,8 @@ def met_office():
         return []
 
 def river():
+    """River level and flow from Environment Agency telemetry. Optional: if the
+    station is wrong for your area, change the id and it degrades gracefully."""
     try:
         d = json.loads(get("https://environment.data.gov.uk/flood-monitoring/id/stations/4085"))
         out = {}
@@ -72,6 +80,7 @@ def river():
         return {}
 
 def main():
+    """Build almanac.html."""
     today = dt.date.today().isoformat()
     rise, set_, deg, illum = sun_moon()
     phases = [(0, "New Moon"), (45, "Waxing Crescent"), (90, "First Quarter"),

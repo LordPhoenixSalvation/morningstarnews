@@ -12,16 +12,16 @@
 # --- Where things live ------------------------------------------------------
 # JOBS_DIR = this folder: the scripts, the quote pool, the cache files.
 # REPO_DIR = the folder GitHub publishes from: editions/ and posts/ live here.
-JOBS_DIR="${JOBS_DIR:-/home/YOURNAME/jobs}"
-REPO_DIR="${REPO_DIR:-/home/YOURNAME/repo/morningstarnews}"
+JOBS_DIR="${JOBS_DIR:-/home/u10000/jobs}"
+REPO_DIR="${REPO_DIR:-/home/u10000/repo/morningstarnews}"
 
 # --- The paper --------------------------------------------------------------
 # PAPER_NAME appears in the masthead and in email subject lines.
-PAPER_NAME="${PAPER_NAME:-Your Paper}"
+PAPER_NAME="${PAPER_NAME:-Morningstar News}"
 
 # SITE_URL is where the paper is published. NO TRAILING SLASH.
 # The publisher writes this address into every page and every email link.
-SITE_URL="${SITE_URL:-https://YOURNAME.github.io/YOUR-REPO}"
+SITE_URL="${SITE_URL:-https://lordphoenixsalvation.github.io/morningstarnews}"
 
 # --- Who gets the email -----------------------------------------------------
 # Leave EMAIL_TO empty ("") to skip email entirely and just publish the paper.
@@ -45,7 +45,7 @@ RADIO_GRID="${RADIO_GRID:-IO92}"
 # --- How the AI is called ---------------------------------------------------
 # run_agent.sh handles this. These describe HOW, not WHERE.
 # See run_agent.sh for the three supported options.
-AGENT_CMD="${AGENT_CMD:-rool-llm say /agents/YOURNAME/conversations/CONVERSATION-ID}"
+AGENT_CMD="${AGENT_CMD:-rool-llm say /agents/rool/conversations/<conversation-id>}"
 
 # --- Timezone ---------------------------------------------------------------
 # The paper is dated in UTC so the date always matches the 08:00 cron time.

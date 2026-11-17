@@ -18,9 +18,13 @@ UA = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
                     "(KHTML, like Gecko) Chrome/131.0 Safari/537.36"}
 
 def safe(s):
+    """Strip whitespace and return "" for None, so a missing field never crashes
+    the forecast."""
     return (s or "").strip()
 
 def main():
+    """Read the BBC 3-day RSS feed and print one markdown line. Returns non-zero
+    if the feed cannot be read, which tells the paper to omit the block."""
     try:
         r = requests.get(FEED, headers=UA, timeout=30)
         r.raise_for_status()

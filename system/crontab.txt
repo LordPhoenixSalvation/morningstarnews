@@ -1,5 +1,2 @@
-# Two jobs, both plain cron. Edit the paths to match config.sh.
-# The trailing comments let you find and replace one job without the other.
-
-0 8 * * *   /home/YOURNAME/jobs/newsletter.sh  # DAILY-NEWSLETTER
-0 9 * * 0   /home/YOURNAME/jobs/weekly.sh      # WEEKLY-PAPER
+0 8 * * * /home/YOURNAME/jobs/newsletter.sh # DAILY-NEWSLETTER
+0 9 * * 0 /home/YOURNAME/jobs/weekly.sh # WEEKLY-PAPER

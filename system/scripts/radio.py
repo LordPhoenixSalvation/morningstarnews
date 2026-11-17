@@ -20,11 +20,14 @@ SATS = [
 ]
 
 def get(url, timeout=25):
+    """Fetch a URL and return its text."""
     req = urllib.request.Request(url, headers={"User-Agent": "morningstar-radio/1.0"})
     with urllib.request.urlopen(req, timeout=timeout) as r:
         return r.read().decode("utf-8", "replace")
 
 def tles():
+    """Download the current orbital elements (TLEs) for the satellites in SATS
+    from CelesTrak. These change slowly, so one fetch covers the day."""
     out = {}
     for name, catnr in SATS:
         try:
@@ -36,6 +39,9 @@ def tles():
     return out
 
 def passes(tle_map):
+    """Work out when each satellite rises above the horizon for your latitude
+    and longitude, how high it gets, and in which direction. This is the maths
+    behind the pass table."""
     from skyfield.api import load, wgs84, EarthSatellite
     ts = load.timescale()
     obs = wgs84.latlon(LAT, LON, elevation_m=ALT)
@@ -72,6 +78,8 @@ def passes(tle_map):
     return out
 
 def spacewx():
+    """Space weather: the planetary K index and solar flux from NOAA. High Kp
+    means the aurora may be visible and HF radio gets difficult."""
     d = {}
     try:
         kp = json.loads(get("https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json"))
@@ -94,6 +102,7 @@ def spacewx():
     return d
 
 def band_from_kp(kp):
+    """Translate the K index into a plain statement about HF conditions."""
     if kp < 3: return "Quiet &mdash; good HF conditions, especially 20m and below."
     if kp < 4: return "Unsettled &mdash; some fading on the higher bands, lower bands steadier."
     if kp < 5: return "Active &mdash; expect fading and flutter, better on 40m and 80m."
@@ -101,6 +110,7 @@ def band_from_kp(kp):
     return "Storm &mdash; widespread HF blackouts likely, watch for aurora on 6m and 2m."
 
 def main():
+    """Build radio.html."""
     today = dt.date.today().isoformat()
     tle_map = tles()
     pl = passes(tle_map) if tle_map else []
