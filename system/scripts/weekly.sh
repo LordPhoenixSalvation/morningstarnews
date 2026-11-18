@@ -32,7 +32,7 @@ STAGE 2 - WRITE IT. Write to {{REPO}}/editions/$(date -u +%F)-weekly.md with a h
 - A closing observation of two or three sentences, longer and more reflective than the daily's one-liner.
 Tone: the same dry British newspaper voice as the daily, but with room to breathe - proper sentences, developed argument, no bullet-point padding. Every factual claim from outside the dailies needs a real retrieved source link. If you have not verified it, leave it out. Put {{xkcd:NUMBER}} on its own line about a third of the way in if a comic genuinely fits.
 
-STAGE 3 - QUOTE, WEATHER, FORAGING. Run python3 {{JOBS}}/weather.py and insert its output verbatim after the standfirst if it prints. Run python3 {{JOBS}}/forage.py and insert verbatim at the very end if it prints. Never write either yourself.
+STAGE 3 - QUOTE, WEATHER, FORAGING. Write the closing quote in as usual. Leave the weather and the foraging note alone: the publisher adds both from the scripts when it builds the page. Do not run those scripts and do not write a forecast yourself.
 
 STAGE 4 - PUBLISH. Run: cd {{REPO}} && python3 {{JOBS}}/publish.py $(date -u +%F)-weekly and confirm it prints the published URL. It will also put a 'Sunday Paper' link at the top of the front page and in the archive. Do not let the weekly replace the front page's daily edition.
 

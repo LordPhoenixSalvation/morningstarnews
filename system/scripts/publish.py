@@ -381,10 +381,55 @@ def epigraph(date):
             f'<p class="src">&mdash; {html.escape(q["source"])}</p></div>')
 
 
+
+# --- Script-generated blocks -------------------------------------------------
+# The weather strip and the foraging note are produced by scripts from official
+# feeds, never written by the AI. They are injected here at publish time so the
+# model does not spend two turns running a script and pasting its output.
+JOBS = os.environ.get("JOBS_DIR", "/home/YOURNAME/jobs")
+
+
+def script_block(name, timeout=90):
+    """Run one of the jobs scripts and return its stdout, or "" if it fails.
+    A failure must never stop the paper going out."""
+    try:
+        r = subprocess.run([sys.executable, os.path.join(JOBS, name)],
+                           capture_output=True, text=True, timeout=timeout)
+        if r.returncode != 0 or not r.stdout.strip():
+            print(f"note: {name} produced nothing", file=sys.stderr)
+            return ""
+        return r.stdout.strip()
+    except Exception as e:
+        print(f"note: {name} failed: {e}", file=sys.stderr)
+        return ""
+
+
+def inject_script_blocks(md):
+    """Insert weather after the standfirst and foraging at the end. Idempotent:
+    if the block is already in the file (an older edition, or a hand-run) it is
+    left alone rather than duplicated."""
+    w = script_block("weather.py")
+    if w:
+        lines = md.split("\n")
+        key = w.splitlines()[0][:40]
+        if key not in md:
+            for i, ln in enumerate(lines):
+                if ln.startswith("## "):
+                    lines.insert(i, w + "\n")
+                    md = "\n".join(lines)
+                    break
+    f = script_block("forage.py")
+    if f:
+        key = f.splitlines()[0][:40]
+        if key not in md:
+            md = md.rstrip() + "\n\n" + f + "\n"
+    return md
+
+
 def build_body(md, date):
     """Assemble the article HTML: standfirst, sections, items, images, the xkcd
     comic at the midpoint, and the closing quote."""
-    md = drop_empty_sections(md)
+    md = inject_script_blocks(drop_empty_sections(md))
     xk = re.search(r'\{\{xkcd:(\d+)\}\}', md)
     xkcd_html = ""
     if xk:

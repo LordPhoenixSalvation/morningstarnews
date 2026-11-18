@@ -14,15 +14,17 @@ fit before reading code.
 cron ──► newsletter.sh ──► run_agent.sh ──► the AI
              │                                │
              │   (before the AI is called)    │
-             ├─ recent.py     what already ran
-             ├─ weather.py    the forecast
-             └─ forage.py     what's in season
+             ├─ almanac.py, radio.py, forage_guide.py   reference pages
+             └─ run_agent.sh opens a fresh conversation
                                               │
                               the AI researches, writes editions/<date>.md,
                               then runs the publisher and sends the email
                                               │
                                               ▼
                                         publish.py <date>
+                                              │
+             weather.py + forage.py ──────────┤  injected at build time
+             digest.py ───────────────────────┤  builds the email body
                                               │
                               editions/*.md ──► HTML + stylesheet + RSS
                                               │
@@ -35,6 +37,23 @@ Two cron jobs:
 |---|---|---|
 | 08:00 daily | `newsletter.sh` | Researches and publishes the daily paper, emails a digest |
 | 09:00 Sunday | `weekly.sh` | The Sunday Paper — longer, weekly, kept out of the daily archive |
+
+## What the AI does, and what it doesn't
+
+The AI is only used for the part that needs judgement: searching, choosing
+stories, and writing them up. Everything mechanical is a script, because scripts
+are cheaper, predictable, and cannot invent a forecast.
+
+| Done by | What |
+|---|---|
+| Scripts, before the AI is called | Reference pages, a fresh conversation |
+| The AI | Research, selection, writing the edition |
+| The publisher, at build time | Weather block, foraging note, images, the xkcd comic, HTML, RSS, git push |
+| `digest.py` | The email body |
+
+One edition is around nine model calls, most of them searches. The weather, the
+foraging note and the reference pages used to cost five turns a day between them
+and now cost none.
 
 ## Every setting lives in one file
 
@@ -57,6 +76,8 @@ follows, including the masthead, the email links and the almanac.
 | `run_agent.sh` | bash | Calls the AI. Swap the block inside to change provider |
 | `publish.py` | Python | Markdown → HTML, CSS, front page, archive, RSS, git push |
 | `recent.py` | Python | Prints the previous edition's headlines and sources |
+| `fetch.py` | Python | Fetches a page and returns only its article text, capped |
+| `digest.py` | Python | Builds the morning email from the finished edition |
 | `weather.py` | Python | The forecast, from the BBC feed |
 | `forage.py` | Python | Today's seasonal note |
 | `forage_guide.py` | Python | The Foraging Year — twelve monthly pages, 30-day cache |

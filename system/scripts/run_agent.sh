@@ -55,6 +55,26 @@ fi
 # Use it only if options 1 and 2 are unavailable.
 
 # ---------------------------------------------------------------------------
+# ROTATION — one fresh conversation per edition
+# ---------------------------------------------------------------------------
+# Every edition used to be appended to the same conversation, so by day 80
+# each run was sitting on top of a growing archive it would never read. A new
+# conversation per run costs nothing and keeps each edition's context to that
+# morning's work. The old conversations stay on disk as the archive; the
+# paper's real memory is editions/ and recent.py.
+#
+# Set AGENT_ROTATE=1 in config.sh to enable. AGENT_ROTATE=0 goes back to
+# reusing one conversation.
+if [ "${AGENT_ROTATE:-0}" = "1" ] && [ "${AGENT_SPEAKER:-rool}" != "" ]; then
+  CONV=$(rool-llm new "${AGENT_SPEAKER:-rool}" -name "${PAPER_NAME} $(date +%F)" 2>/dev/null | tail -1 || true)
+  if [[ "${CONV:-}" == /agents/* ]]; then
+    echo "$(date -u +%FT%TZ) $CONV" >> "$JOBS_DIR/conversations.log"
+    exec rool-llm say "$CONV" "$PROMPT"
+  fi
+  echo "rotation failed, falling back to AGENT_CMD" >&2
+fi
+
+# ---------------------------------------------------------------------------
 # The default: use whatever AGENT_CMD says. Edit AGENT_CMD in config.sh to
 # switch between the options above.
 # ---------------------------------------------------------------------------

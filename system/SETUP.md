@@ -256,7 +256,16 @@ python3 weather.py     # should print a forecast line and a BBC link
 python3 forage.py      # should print what's in season
 python3 almanac.py     # should print "almanac written"
 python3 radio.py       # should print "radio written" and a number of passes
+python3 fetch.py https://www.bbc.co.uk/news 300   # should print a title and trimmed text
+python3 digest.py 2026-01-01                      # needs an edition file to exist first
 ```
+
+The last two are worth a word. `fetch.py` is how the AI reads a web page: given a
+URL it returns the title and the article text with menus, ads and cookie banners
+stripped, cut at a word limit. Reading a page raw costs about ten times as much
+for the same sentences, which is most of the difference between a cheap paper and
+an expensive one. `digest.py` builds the morning email from a finished edition, so
+the links and section anchors are never retyped by hand.
 
 If all four print something sensible, the hardest half is done. The page
 `almanac.html` and `radio.html` should now exist in your repo folder.
@@ -415,10 +424,40 @@ These are not decoration. Each one exists because of a specific failure:
 | Read yesterday's list before searching | The same story running twice — it looks fine to the AI, which has no memory of yesterday |
 | Never write the weather, only print the script's output | A confidently invented forecast |
 | The publisher refuses repeated sources | Everything above, caught mechanically when the AI forgets |
+| The AI never writes weather or foraging; the publisher injects them | A confidently invented forecast, and two wasted turns per edition |
 
 The repeat check is in `publish.py`. When it prints `REPEATED SOURCES`, that is a
 failure, not a warning: the paper did not go out. The fix is to replace those
 items with fresh ones.
+
+### What the scripts do on their own
+
+Worth knowing, because it is what keeps a paper cheap:
+
+- **The weather and the foraging note are added by the publisher**, not by the AI.
+  They come from `weather.py` and `forage.py` and are injected when the page is
+  built. The instruction tells the AI to leave them alone, and if you ever see a
+  forecast in an edition file, something has gone wrong — a model-written forecast
+  is the one thing this system must never produce.
+- **The reference pages** (Almanac, Radio, Foraging Year) are rebuilt before the
+  AI is even called.
+- **The digest** is generated from the edition file by `digest.py`.
+
+That leaves the AI doing only what needs judgement: searching, choosing, and
+writing.
+
+### One conversation per edition
+
+`config.sh` sets `AGENT_ROTATE=1`, which gives each run a brand-new conversation.
+That matters more than it sounds. Append eighty editions to one conversation and
+every morning's run sits on top of an archive it will never read. Rotating keeps
+each run to that morning's work; old conversations stay on disk if you want to
+look back, and each new one is logged to `~/jobs/conversations.log`.
+
+The paper's real memory is `editions/` and `recent.py` — the files, not the chat.
+That is why rotating costs nothing.
+
+Set `AGENT_ROTATE=0` if you would rather reuse a single conversation.
 
 ### The Sunday paper
 
@@ -450,6 +489,10 @@ them, and publish again.
 
 **A section is empty or missing.**
 Also working as intended. The instruction says omit rather than pad.
+
+**An edition file has no weather block.** The publisher adds it at build time. If
+`weather.py` fails it prints a note and the paper goes out without the strip, which
+is correct behaviour — better no forecast than an invented one.
 
 **`weather.py` prints nothing.**
 The BBC feed changed or is down. The paper will run without a weather block —

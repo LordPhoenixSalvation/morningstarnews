@@ -12,8 +12,8 @@
 # --- Where things live ------------------------------------------------------
 # JOBS_DIR = this folder: the scripts, the quote pool, the cache files.
 # REPO_DIR = the folder GitHub publishes from: editions/ and posts/ live here.
-JOBS_DIR="${JOBS_DIR:-/home/u10000/jobs}"
-REPO_DIR="${REPO_DIR:-/home/u10000/repo/morningstarnews}"
+JOBS_DIR="${JOBS_DIR:-/home/YOURNAME/jobs}"
+REPO_DIR="${REPO_DIR:-/home/YOURNAME/repo/morningstarnews}"
 
 # --- The paper --------------------------------------------------------------
 # PAPER_NAME appears in the masthead and in email subject lines.
@@ -47,6 +47,13 @@ RADIO_GRID="${RADIO_GRID:-IO92}"
 # See run_agent.sh for the three supported options.
 AGENT_CMD="${AGENT_CMD:-rool-llm say /agents/rool/conversations/<conversation-id>}"
 
+# AGENT_ROTATE=1 gives every edition a brand-new conversation, so a run never
+# carries the whole archive of past editions into its context. The old ones are
+# kept, and each new one is logged to conversations.log.
+# AGENT_SPEAKER is the agent that hosts the conversation (rool = this machine).
+AGENT_ROTATE="${AGENT_ROTATE:-1}"
+AGENT_SPEAKER="${AGENT_SPEAKER:-rool}"
+
 # --- Timezone ---------------------------------------------------------------
 # The paper is dated in UTC so the date always matches the 08:00 cron time.
 # Only change this if you move the cron job and know why.
@@ -55,4 +62,4 @@ export TZ="${TZ:-UTC}"
 # Everything below is derived — do not edit.
 export JOBS_DIR REPO_DIR PAPER_NAME SITE_URL EMAIL_TO
 export PLACE_NAME PLACE_TOWN PLACE_LAT PLACE_LON BBC_WEATHER_ID RADIO_GRID
-export AGENT_CMD
+export AGENT_CMD AGENT_ROTATE AGENT_SPEAKER
