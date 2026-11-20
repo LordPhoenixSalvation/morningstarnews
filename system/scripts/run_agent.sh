@@ -69,7 +69,31 @@ if [ "${AGENT_ROTATE:-0}" = "1" ] && [ "${AGENT_SPEAKER:-rool}" != "" ]; then
   CONV=$(rool-llm new "${AGENT_SPEAKER:-rool}" -name "${PAPER_NAME} $(date +%F)" 2>/dev/null | tail -1 || true)
   if [[ "${CONV:-}" == /agents/* ]]; then
     echo "$(date -u +%FT%TZ) $CONV" >> "$JOBS_DIR/conversations.log"
-    exec rool-llm say "$CONV" "$PROMPT"
+    rool-llm say "$CONV" "$PROMPT"
+    # `say` can return while the agent is still working - it hands the prompt
+    # over rather than waiting for the last turn. If the caller publishes the
+    # moment this script exits, it publishes whatever was on disk BEFORE the
+    # agent wrote today's edition: the page goes out one edition stale and the
+    # digest describes the wrong paper. So wait for the conversation to reach
+    # 'done' before returning. The state file is written by the machine inside
+    # the conversation folder.
+    conv_dir="$CONV"
+    [ -d "$conv_dir" ] || conv_dir="/agents/$(basename "$(dirname "$CONV")")/conversations/$(basename "$CONV")"
+    waited=0
+    while [ -f "$conv_dir/state" ]; do
+      st=$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1])).get("state",""))' "$conv_dir/state" 2>/dev/null || echo "")
+      case "$st" in
+        done|"") break ;;
+      esac
+      sleep 5
+      waited=$((waited + 5))
+      if [ "$waited" -ge 2700 ]; then
+        echo "agent still running after 45 minutes - giving up waiting" >&2
+        break
+      fi
+    done
+    [ "$waited" -gt 0 ] && echo "agent finished after ${waited}s" >&2
+    exit 0
   fi
   echo "rotation failed, falling back to AGENT_CMD" >&2
 fi
