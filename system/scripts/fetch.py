@@ -7,7 +7,11 @@ tokens on menus, cookie banners and "related stories" it will never use. This
 script strips all of that and prints a title line plus the article text, capped
 at a word limit, so the same information costs a few hundred tokens.
 
-    python3 fetch.py <url> [max_words]
+    python3 fetch.py <url> [<url> ...] [--words N]
+
+Fetch several pages in ONE call and separate them with a line of dashes. That
+matters more than it looks: every separate call re-sends the whole conversation
+to the model, so six URLs in one call can be a fifth of the cost of six calls.
 
 Prints:
     Title: <page title>
@@ -61,11 +65,8 @@ def text_of(soup):
     return re.sub(r"\n{3,}", "\n\n", body.get_text("\n", strip=True))
 
 
-def main():
-    if len(sys.argv) < 2:
-        sys.exit(__doc__)
-    url = sys.argv[1]
-    limit = int(sys.argv[2]) if len(sys.argv) > 2 else 700
+def one(url, limit, total_cap):
+    """Fetch a single URL and return the printable block, or an error line."""
     try:
         r = requests.get(url, timeout=20, headers={
             "User-Agent": "Mozilla/5.0 (compatible; MorningstarNews/1.0)"})
@@ -75,7 +76,7 @@ def main():
         if "charset" not in r.headers.get("content-type", "").lower():
             r.encoding = "utf-8"
     except Exception as e:
-        sys.exit(f"fetch failed: {e}")
+        return f"Title: (fetch failed)\nURL Source: {url}\nMarkdown Content:\nfetch failed: {e}"
 
     soup = BeautifulSoup(r.text, "html.parser")
     title = (soup.title.get_text(strip=True) if soup.title else url)
@@ -85,10 +86,36 @@ def main():
     if len(words) > limit:
         body = " ".join(words[:limit]) + " [...]"
 
-    print(f"Title: {title}")
-    print(f"URL Source: {url}")
-    print("Markdown Content:")
-    print(body)
+    return f"Title: {title}\nURL Source: {url}\nMarkdown Content:\n{body}"
+
+
+def main():
+    args = sys.argv[1:]
+    limit = 700
+    # --words N sets the per-page cap; everything else is a URL.
+    if "--words" in args:
+        i = args.index("--words")
+        limit = int(args[i + 1])
+        del args[i:i + 2]
+    if not args:
+        sys.exit(__doc__)
+
+    # A hard ceiling on the whole call, so a long list of URLs cannot flood the
+    # conversation. Roughly 900 words of body text per page is plenty.
+    total_cap = 1400 * len(args)
+    out, used = [], 0
+    for u in args:
+        block = one(u, limit, total_cap)
+        out.append(block)
+        used += len(block.split())
+        if used > total_cap:
+            out.append("(stopped: output cap reached, fetch the rest separately)")
+            break
+    print("\n\n" + "-" * 70 + "\n\n".join(out))
+
+    # Exit non-zero only if nothing at all could be read.
+    if all("fetch failed" in b for b in out):
+        sys.exit(1)
 
 
 if __name__ == "__main__":

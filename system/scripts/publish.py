@@ -709,7 +709,9 @@ def main():
         sys.exit(f"missing {src}")
     md = open(src, encoding="utf-8").read()
 
-    check_repeats(md, date)
+    # A repeat means the paper is wrong, so exit 2 rather than 0. The wrapper
+    # uses that to refuse to email a digest of a paper that repeated itself.
+    repeats = check_repeats(md, date)
 
     body = build_body(md, date)
     title_m = re.search(r'^#\s+(.+)$', md, re.M)
@@ -810,6 +812,8 @@ def main():
     if r.returncode != 0 and "nothing to commit" not in (r.stdout + r.stderr):
         print(r.stdout, r.stderr)
     print("Published:", f"{SITE}/posts/{out_name}.html")
+    if repeats:
+        sys.exit(2)
 
 
 if __name__ == "__main__":

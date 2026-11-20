@@ -46,14 +46,24 @@ are cheaper, predictable, and cannot invent a forecast.
 
 | Done by | What |
 |---|---|
-| Scripts, before the AI is called | Reference pages, a fresh conversation |
-| The AI | Research, selection, writing the edition |
+| Scripts, before the AI is called | Reference pages, yesterday's headlines, a fresh conversation |
+| The AI | Research, selection, writing the edition, publishing it |
+| `newsletter.sh`, after the AI stops | The digest and the email |
 | The publisher, at build time | Weather block, foraging note, images, the xkcd comic, HTML, RSS, git push |
-| `digest.py` | The email body |
 
-One edition is around nine model calls, most of them searches. The weather, the
-foraging note and the reference pages used to cost five turns a day between them
-and now cost none.
+### Why turns are the thing to count
+
+Every turn re-sends the entire conversation to the model. Ten turns is not ten
+times the first turn - it is the sum of a conversation that grows with every step,
+so the last turns cost several times what the first ones did. Two habits follow
+from that, and both are written into the prompt:
+
+- **Batch the searching.** All the day's searches go out in one message, up to
+  eight at once, and the chosen articles are read with one `fetch.py` call listing
+  every URL. One at a time, the same research can cost five times as much.
+- **Stop the AI when the writing is done.** The digest and the email are plain
+  scripts. Leaving them to the agent meant several turns spent re-reading a very
+  long conversation to do something a shell command does for nothing.
 
 ## Every setting lives in one file
 

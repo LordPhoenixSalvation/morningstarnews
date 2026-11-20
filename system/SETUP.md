@@ -257,6 +257,7 @@ python3 forage.py      # should print what's in season
 python3 almanac.py     # should print "almanac written"
 python3 radio.py       # should print "radio written" and a number of passes
 python3 fetch.py https://www.bbc.co.uk/news 300   # should print a title and trimmed text
+python3 fetch.py https://www.bbc.co.uk/news https://www.bbc.co.uk/sport --words 200   # several at once
 python3 digest.py 2026-01-01                      # needs an edition file to exist first
 ```
 
@@ -264,7 +265,8 @@ The last two are worth a word. `fetch.py` is how the AI reads a web page: given 
 URL it returns the title and the article text with menus, ads and cookie banners
 stripped, cut at a word limit. Reading a page raw costs about ten times as much
 for the same sentences, which is most of the difference between a cheap paper and
-an expensive one. `digest.py` builds the morning email from a finished edition, so
+an expensive one. Passing several URLs to one call matters for the same reason:
+ten separate calls re-send the conversation ten times. `digest.py` builds the morning email from a finished edition, so
 the links and section anchors are never retyped by hand.
 
 If all four print something sensible, the hardest half is done. The page
