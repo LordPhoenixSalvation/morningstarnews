@@ -46,24 +46,27 @@ are cheaper, predictable, and cannot invent a forecast.
 
 | Done by | What |
 |---|---|
-| Scripts, before the AI is called | Reference pages, yesterday's headlines, a fresh conversation |
-| The AI | Research, selection, writing the edition, publishing it |
-| `newsletter.sh`, after the AI stops | The digest and the email |
-| The publisher, at build time | Weather block, foraging note, images, the xkcd comic, HTML, RSS, git push |
+| Scripts, before the AI is called | Reference pages, a fresh conversation |
+| The AI | Research, selection, writing, the weather and foraging blocks, publishing, the digest, the email |
+| The publisher, at build time | Images, the xkcd comic, HTML, RSS, git push |
 
-### Why turns are the thing to count
+### Cost, and what did not work
 
-Every turn re-sends the entire conversation to the model. Ten turns is not ten
-times the first turn - it is the sum of a conversation that grows with every step,
-so the last turns cost several times what the first ones did. Two habits follow
-from that, and both are written into the prompt:
+An edition costs roughly 50 credits. That number comes from counting turns: every
+turn re-sends the whole conversation, so ten turns is not ten times the first turn
+but the sum of a conversation that grows at every step.
 
-- **Batch the searching.** All the day's searches go out in one message, up to
-  eight at once, and the chosen articles are read with one `fetch.py` call listing
-  every URL. One at a time, the same research can cost five times as much.
-- **Stop the AI when the writing is done.** The digest and the email are plain
-  scripts. Leaving them to the agent meant several turns spent re-reading a very
-  long conversation to do something a shell command does for nothing.
+A round of optimisation in November 2026 tried to cut this — batching every search
+into one turn, moving the weather, the digest and the email into scripts, and
+squeezing page reads through a trimmer. It made things four times worse (483
+credits on the worst morning). Fewer turns did not survive bigger turns: firing
+eight searches at once returned 4-5 KB of results each, and the conversation grew
+to 173 KB where the old one was 33 KB. It was rolled back.
+
+If you try again, change one thing, run it, and count the credits before changing
+a second. The lesson is that the thing to measure is total conversation size, not
+turn count.
+
 
 ## Every setting lives in one file
 
