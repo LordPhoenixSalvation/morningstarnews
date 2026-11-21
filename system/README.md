@@ -14,16 +14,14 @@ fit before reading code.
 cron ──► newsletter.sh ──► run_agent.sh ──► the AI
              │                                │
              │   (before the AI is called)    │
-             ├─ almanac.py, radio.py, forage_guide.py   reference pages
-             └─ run_agent.sh opens a fresh conversation
+             └─ almanac.py, radio.py, forage_guide.py   reference pages
                                               │
-                              the AI researches, writes editions/<date>.md,
-                              then runs the publisher and sends the email
+           the AI runs weather.py + forage.py, researches, writes
+           editions/<date>.md with that text pasted in, runs the
+           publisher, and sends the email
                                               │
                                               ▼
                                         publish.py <date>
-                                              │
-     weather.py + forage.py (run by the AI) ──┤  pasted into the edition
                                               │
                               editions/*.md ──► HTML + stylesheet + RSS
                                               │

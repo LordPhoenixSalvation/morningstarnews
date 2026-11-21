@@ -456,7 +456,8 @@ look back, and each new one is logged to `~/jobs/conversations.log`.
 The paper's real memory is `editions/` and `recent.py` — the files, not the chat.
 That is why rotating costs nothing.
 
-Set `AGENT_ROTATE=0` if you would rather reuse a single conversation.
+Leave `AGENT_ROTATE=0` to reuse one conversation, which is what this paper does;
+set it to `1` to start a fresh one each morning.
 
 ### The Sunday paper
 
