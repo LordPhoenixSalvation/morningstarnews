@@ -13,16 +13,21 @@ If you get stuck, the most likely cause is written down in
 
 ## What you are actually building
 
-Every morning at 8am, your computer wakes up on a timer and does this:
+Every morning at 8am, your computer wakes up on a timer, opens a conversation
+with an AI, and hands it one long instruction. The AI then does all of this:
 
 1. Runs a small program that prints yesterday's headlines, so today's paper knows
    what not to repeat.
-2. Runs a small program that prints the weather and what's in season.
-3. Hands a long instruction to an AI, and that AI searches the web for today's
-   news, writes today's paper as a text file, and saves it.
-4. Runs the publisher, which turns that text file into a web page, puts it on
-   your site, and adds it to the archive.
-5. Emails you a list of the headlines.
+2. Searches the web for today's news, opening the pages it finds.
+3. Runs a small program that prints the weather, and another that prints what's in
+   season, and pastes both into the paper word for word.
+4. Writes today's paper as a text file.
+5. Runs the publisher, which turns that text file into a web page, puts it on your
+   site, and adds it to the archive.
+6. Emails you a list of the headlines.
+
+Only steps 1, 3 and 5 are programs. Everything else is the AI following the
+instruction.
 
 You are not writing a news website. You are writing **one long instruction** and
 setting a timer for it. Everything else is plumbing.
@@ -168,14 +173,14 @@ sudo apt update
 sudo apt install -y pandoc python3 python3-pip python3-venv
 
 # Python packages the scripts need
-pip3 install requests beautifulsoup4 pillow matplotlib skyfield
+pip3 install requests beautifulsoup4 pillow skyfield
 ```
 
 Check it worked:
 
 ```bash
 pandoc --version | head -1
-python3 -c "import requests, bs4, PIL, matplotlib, skyfield; print('all good')"
+python3 -c "import requests, bs4, PIL, skyfield; print('all good')"
 ```
 
 You should see a pandoc version and `all good`.
@@ -268,31 +273,48 @@ a missing Python package. See [Troubleshooting](#troubleshooting).
 
 ## Step 5 — Tell it how to reach the AI
 
-Open `~/jobs/run_agent.sh`. It contains three options as comments. Uncomment the
-one that applies to you and comment out the others.
+`~/jobs/run_agent.sh` is the file that reaches the AI. Read it: the three ways
+to do it are explained there as comments, and you only use one of them.
+
+There are two settings in `config.sh` that decide what happens:
+
+```bash
+AGENT_ROTATE="1"    # 1 = a fresh conversation each run (recommended)
+AGENT_CMD="rool-llm say /agents/YOURNAME/conversations/YOUR-ID"
+```
+
+With `AGENT_ROTATE="1"` the script creates a new conversation for each run, sends
+the prompt into it, waits for it to finish, and `AGENT_CMD` is ignored. With
+`AGENT_ROTATE="0"` it runs whatever `AGENT_CMD` says every time, into the one
+conversation named there.
 
 ### If you are on a Rool Machine
 
-Change `AGENT_CMD` in `config.sh` to your own conversation path:
+Leave `AGENT_ROTATE="1"` and set `AGENT_SPEAKER` to the account the conversation
+belongs to (usually your username). Nothing else to do — the machine already has
+web search, file access and email.
+
+If you would rather reuse one conversation, set `AGENT_ROTATE="0"` and put its
+path in `AGENT_CMD`:
 
 ```bash
 AGENT_CMD="rool-llm say /agents/YOURNAME/conversations/YOUR-ID"
 ```
 
-Nothing else to do. The machine already has web search, file access and email.
-
 ### If you are using a local agent app
 
-Install one, log in, and change `AGENT_CMD` to that app's one-shot command. For
+Local apps usually cannot create a conversation for you, so set
+`AGENT_ROTATE="0"` and change `AGENT_CMD` to that app's one-shot command. For
 Claude Code it looks like:
 
 ```bash
+AGENT_ROTATE="0"
 AGENT_CMD="claude -p --allowedTools Bash,WebSearch,Read,Write"
 ```
 
-Check your app's help for the exact flag that means "run this prompt once and
-exit" — it is usually `-p` or `exec`. The prompt has to arrive as a single
-argument, which is what `run_agent.sh` does.
+Install the app and log in first. Then check its help for the exact flag that
+means "run this prompt once and exit" — it is usually `-p` or `exec`. The prompt
+has to arrive as a single argument, which is what `run_agent.sh` does.
 
 **Email is the one thing a local agent may not be able to do.** If your setup has
 no email tool, set `EMAIL_TO=""` in `config.sh` and skip the digest. The paper
@@ -421,7 +443,7 @@ These are not decoration. Each one exists because of a specific failure:
 | Read yesterday's list before searching | The same story running twice — it looks fine to the AI, which has no memory of yesterday |
 | Never write the weather, only print the script's output | A confidently invented forecast |
 | The publisher refuses repeated sources | Everything above, caught mechanically when the AI forgets |
-| The AI never writes weather or foraging; the publisher injects them | A confidently invented forecast, and two wasted turns per edition |
+| The AI never writes a forecast or a foraging note, only pastes the scripts' output | A confidently invented forecast |
 
 The repeat check is in `publish.py`. When it prints `REPEATED SOURCES`, that is a
 failure, not a warning: the paper did not go out. The fix is to replace those
@@ -435,8 +457,9 @@ Worth knowing, because it is what keeps a paper cheap:
   The instruction tells it to run `weather.py` and `forage.py` and paste the
   output in verbatim. It never invents a forecast — a model-written forecast is
   the one thing this system must never produce.
-- **The reference pages** (Almanac, Radio, Foraging Year) are rebuilt before the
-  AI is even called.
+- **The reference pages** (Almanac, Radio, Foraging Year) are built by the AI
+  running three scripts during the job, and it is told not to edit their output.
+  A broken one never stops the paper going out.
 - **The closing quote is added by the publisher** from `quotes.json`. The
   instruction tells the AI to stop at its closing observation and write no
   quotation of its own, so an edition has exactly one epigraph.
@@ -446,30 +469,33 @@ writing.
 
 ### One conversation per edition
 
-`config.sh` ships with `AGENT_ROTATE=0`, so every run reuses one conversation. Set
-it to `1` and each run gets a brand-new conversation instead.
-That matters more than it sounds. Append eighty editions to one conversation and
-every morning's run sits on top of an archive it will never read. Rotating keeps
-each run to that morning's work; old conversations stay on disk if you want to
-look back, and each new one is logged to `~/jobs/conversations.log`.
+`config.sh` ships with `AGENT_ROTATE=1`, so each run opens a brand-new
+conversation instead of appending to the same one. This paper runs that way.
+
+It matters more than it sounds. Append eighty editions to one conversation and
+every morning's run sits on top of an archive it will never read, and you pay to
+re-send that archive every turn. Rotating keeps each run to that morning's work.
+Old conversations stay on disk if you want to look back, and each new one is
+logged to `~/jobs/conversations.log`.
 
 The paper's real memory is `editions/` and `recent.py` — the files, not the chat.
 That is why rotating costs nothing.
 
-Leave `AGENT_ROTATE=0` to reuse one conversation, which is what this paper does;
-set it to `1` to start a fresh one each morning.
+Set `AGENT_ROTATE=0` to go back to a single long conversation. When it is `1`,
+`AGENT_CMD` is not used: `run_agent.sh` calls `rool-llm` directly, because only
+that can create the conversation and then wait for it to finish.
 
 ### The Sunday paper
 
-`weekly.sh` reads the week's seven daily editions and writes a longer piece. It
-skips the repeat check on purpose — a weekly is meant to revisit the week. Either
-keep it, change it, or delete the cron line and have a daily only.
+`weekly.sh` reads the week's daily editions and writes a longer piece. It skips
+the repeat check on purpose — a weekly is meant to revisit the week. Either keep
+it, change it, or delete the cron line and have a daily only.
 
-With the daily running Monday to Saturday, those seven editions are exactly the
-week just gone: last Sunday's paper is not a daily, so the weekly starts clean on
-Monday and covers the seven days up to Saturday. Give the daily all seven days
-and the weekly would instead read Monday-to-Sunday, with Sunday's own daily half
-an hour old and duplicated in it.
+With the daily running Monday to Saturday, there are six dailies to read, and
+they are exactly the week just gone: Monday to Saturday. There is no Sunday
+daily, because the Sunday Paper is the only paper that day. Give the daily all
+seven days and the weekly would read seven editions including that morning's
+half-hour-old daily, covering the same ground twice.
 
 ### Optional: cheaper runs
 
@@ -509,8 +535,6 @@ less. This paper's own history is the warning: a round of changes cut the turns
 from 34 to 11 and made the edition ten times more expensive, because each turn
 was carrying eight fat search results instead of two. It was reverted. Fewer,
 smaller turns is the goal; fewer turns alone is not.
-
-Set `AGENT_ROTATE=1` too if you expect to run for months — see above.
 
 ---
 
@@ -576,9 +600,8 @@ The scripts cost nothing to run: a few web requests a day.
 The AI is the only real cost. This one runs at roughly 50 credits an edition on
 Rool, which is about €0.07. On a metered provider expect 8-10 model calls with
 web search per edition — pennies rather than pounds, but search-heavy work costs
-more than chat because every fetched page goes into the conversation. Check your provider's pricing before
-committing — search-heavy work uses more tokens than chat because every fetched
-page goes into the context.
+more than chat because every fetched page goes into the conversation. Check your
+provider's pricing before committing.
 
 GitHub Pages is free for public repositories.
 

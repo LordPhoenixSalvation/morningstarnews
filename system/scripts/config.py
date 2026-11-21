@@ -16,16 +16,16 @@ CONFIG_SH = os.path.join(HERE, "config.sh")
 
 DEFAULTS = {
     "JOBS_DIR": HERE,
-    "REPO_DIR": os.path.join(os.path.expanduser("~"), "repo", "morningstarnews"),
-    "PAPER_NAME": "Morningstar News",
-    "SITE_URL": "https://example.github.io/morningstarnews",
+    "REPO_DIR": os.path.join(os.path.expanduser("~"), "repo", "YOUR-REPO"),
+    "PAPER_NAME": "The Daily Paper",
+    "SITE_URL": "https://YOURNAME.github.io/YOUR-REPO",
     "EMAIL_TO": "",
-    "PLACE_NAME": "Derbyshire",
-    "PLACE_TOWN": "Derby",
-    "PLACE_LAT": "52.9219",
-    "PLACE_LON": "-1.4756",
-    "BBC_WEATHER_ID": "2651347",
-    "RADIO_GRID": "IO92",
+    "PLACE_NAME": "Your County",
+    "PLACE_TOWN": "Your Town",
+    "PLACE_LAT": "52.2053",
+    "PLACE_LON": "0.1218",
+    "BBC_WEATHER_ID": "2655603",
+    "RADIO_GRID": "JO02",
 }
 
 

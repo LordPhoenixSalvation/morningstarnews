@@ -12,17 +12,21 @@ fit before reading code.
 
 ```
 cron ──► newsletter.sh ──► run_agent.sh ──► the AI
-             │                                │
-             │   (before the AI is called)    │
-             └─ almanac.py, radio.py, forage_guide.py   reference pages
+                          (opens a fresh
+                           conversation, then
+                           waits for it to finish)
                                               │
-           the AI runs weather.py + forage.py, researches, writes
-           editions/<date>.md with that text pasted in, runs the
-           publisher, and sends the email
+   the AI does everything else, in the order the prompt gives it:
+     recent.py        yesterday's headlines and links (stage 0)
+     web search       it reads the pages itself
+     weather.py       forecast, pasted in verbatim (stage 2b)
+     forage.py        seasonal note, pasted in verbatim (stage 2b)
+     almanac.py, radio.py, forage_guide.py   reference pages (stage 2c)
+     writes editions/<date>.md
+     publish.py       builds the pages (stage 3)
+     send_email       the digest (stage 4)
                                               │
                                               ▼
-                                        publish.py <date>
-                                              │
                               editions/*.md ──► HTML + stylesheet + RSS
                                               │
                                        git push ──► GitHub Pages
@@ -43,9 +47,9 @@ are cheaper, predictable, and cannot invent a forecast.
 
 | Done by | What |
 |---|---|
-| Scripts, before the AI is called | Reference pages, a fresh conversation |
-| The AI | Research, selection, writing, the weather and foraging blocks, publishing, the digest, the email |
-| The publisher, at build time | Images, the xkcd comic, HTML, RSS, git push |
+| `run_agent.sh`, before the AI is called | A fresh conversation, and the wait for it to finish |
+| The AI | Running the other scripts, research, selection, writing, the weather and foraging blocks, publishing, the digest, the email |
+| The publisher, at build time | Images, the xkcd comic, HTML, RSS, the closing quote, git push |
 
 ### Cost, and what did not work
 
@@ -55,8 +59,9 @@ but the sum of a conversation that grows at every step.
 
 A round of optimisation in November 2026 tried to cut this — batching every search
 into one turn, moving the weather, the digest and the email into scripts, and
-squeezing page reads through a trimmer. It made things four times worse (483
-credits on the worst morning). Fewer turns did not survive bigger turns: firing
+squeezing page reads through a trimmer. It made things ten times worse — 483
+credits on the worst morning and 245 the next, against a 49-credit baseline.
+Fewer turns did not survive bigger turns: firing
 eight searches at once returned 4-5 KB of results each, and the conversation grew
 to 173 KB where the old one was 33 KB. It was rolled back.
 
@@ -113,8 +118,12 @@ and why.
   prints a blocking `REPEATED SOURCES` failure. This exists because a model with
   no memory of yesterday will rerun yesterday's story and it will look fine to
   the model.
-- **Pulled blocks.** `{{xkcd:2451}}` and the weather/foraging output are
-  substituted at build time. Those are script output, reproduced verbatim.
+- **The comic.** `{{xkcd:2451}}` is fetched and substituted at build time, then
+  moved to the section boundary nearest the middle of the paper.
+- **The closing quote.** Appended from `quotes.json`, picked deterministically
+  from the date. The instruction forbids the AI writing one, so an edition has
+  exactly one epigraph. It does **not** add the weather or the foraging note —
+  the AI pastes those in, and the publisher only styles them.
 - **Page furniture.** Front page, `history.html`, `feed.xml`, the reference pages
   and the dropdown menu bar are regenerated on every publish.
 - **The push.** `git add -A && git commit && git push origin main`. If the push
@@ -124,8 +133,8 @@ and why.
 
 ```
 pandoc            markdown → HTML
-python3           + requests, beautifulsoup4, Pillow, matplotlib
-skyfield          satellite passes (radio.py)
+python3           + requests, beautifulsoup4, Pillow
+skyfield          sun, moon and satellite passes (almanac.py, radio.py)
 de421.bsp         JPL ephemeris, 17 MB, downloaded once, not in this repo
 ```
 

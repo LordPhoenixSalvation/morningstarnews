@@ -82,7 +82,7 @@ def main():
 .warn{{border-left:3px solid #8a2b1f;background:rgba(138,43,31,.06);padding:.8rem .9rem;font-size:.87rem;line-height:1.5;margin:1.2rem 0}}
 .legend{{font-size:.8rem;color:#666;margin:.2rem 0 1rem}}"""
     _inner = f"""</style></head><body><main class="guide">
-<p style="text-align:center;letter-spacing:.22em;font-size:.7rem;text-transform:uppercase;color:#666;margin-bottom:.2rem">Morningstar News</p>
+<p style="text-align:center;letter-spacing:.22em;font-size:.7rem;text-transform:uppercase;color:#666;margin-bottom:.2rem">The Fenland Herald</p>
 <h1 style="text-align:center;font-family:var(--serif,Georgia,serif);font-size:1.9rem;margin:.2rem 0 .1rem">The Foraging Year</h1>
 <p style="text-align:center;font-size:.85rem;color:#555;margin-top:0">What is in season in Britain, month by month</p>
 

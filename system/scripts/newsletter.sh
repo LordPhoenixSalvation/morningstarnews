@@ -28,7 +28,7 @@ source ./config.sh
 # (apart from the {{...}} swaps). The quoting around 'PROMPT' means bash does
 # not touch anything inside, so $ and " and ' are all safe here.
 read -r -d '' RAW_PROMPT <<'PROMPT' || true
-DAILY-NEWSLETTER: Produce today's edition of Morningstar News and publish it to the website, then send a short headline digest by email to {{EMAIL}}.
+DAILY-NEWSLETTER: Produce today's edition of {{PAPER}} and publish it to the website, then send a short headline digest by email to {{EMAIL}}.
 
 STAGE 0 - NOTHING REPEATS. Before searching for anything, run: python3 {{JOBS}}/recent.py
 That prints every headline and every source URL yesterday's edition already used. Those stories are SPENT. Do not run the same story again with different wording - a reader who has had yesterday's paper must not see the same item reappear. Two rules:

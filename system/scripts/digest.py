@@ -46,7 +46,7 @@ def parse(md):
     """Return (title, [ (section, [headline, ...]) ]).
 
     Headlines are the bold run at the start of an item: **Headline** - text.
-    A sub-slot such as '### Derbyshire' is folded into the section above it,
+    A sub-slot such as '### Cambridgeshire' is folded into the section above it,
     because the digest has no room for a heading of its own."""
     title = ""
     m = re.search(r"^#\s+(.+)$", md, re.M)

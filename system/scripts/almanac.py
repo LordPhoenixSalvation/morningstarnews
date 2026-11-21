@@ -124,7 +124,7 @@ def main():
 .almanac ul.plain li{{padding:.4rem 0;border-bottom:1px solid rgba(0,0,0,.1)}}
 .quiet{{color:#666;font-style:italic}}"""
     _inner = f"""</style></head><body><main class="almanac">
-<p style="text-align:center;letter-spacing:.22em;font-size:.7rem;text-transform:uppercase;color:#666;margin-bottom:.2rem">Morningstar News</p>
+<p style="text-align:center;letter-spacing:.22em;font-size:.7rem;text-transform:uppercase;color:#666;margin-bottom:.2rem">The Fenland Herald</p>
 <h1 style="text-align:center;font-family:var(--serif,Georgia,serif);font-size:1.9rem;margin:.2rem 0 .1rem">{html.escape(PLACE)} Almanac</h1>
 <p style="text-align:center;font-size:.85rem;color:#555;margin-top:0">{PLACE} &middot; {today} &middot; updated {stamp}</p>
 <h2>Sun &amp; Moon</h2>
@@ -133,7 +133,7 @@ def main():
 <h2>River Derwent</h2>
 <p>River level and flow from Environment Agency telemetry, updated every 15 minutes. <a href="https://environment.data.gov.uk/flood-monitoring/id/stations/4085">Station 4085</a>.</p>
 <p class="src">Sources: sunrise, sunset and lunar phase computed from the JPL DE421 ephemeris; warnings from the Met Office data feed; river data from the Environment Agency flood-monitoring API. Nothing on this page is written by hand &mdash; every figure is pulled at build time.</p>
-<p style="text-align:center;margin-top:2rem"><a href="./">&larr; Morningstar News</a> &middot; <a href="radio.html">Radio &amp; Satellites</a> &middot; <a href="foraging.html">Foraging Year</a></p>
+<p style="text-align:center;margin-top:2rem"><a href="./">&larr; The Fenland Herald</a> &middot; <a href="radio.html">Radio &amp; Satellites</a> &middot; <a href="foraging.html">Foraging Year</a></p>
 </main>"""
     page = publish.frame(f"{PLACE} Almanac", _inner, CSS_PAGE, today)
     with open(f"{SITE}/almanac.html", "w") as f:

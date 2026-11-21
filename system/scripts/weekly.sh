@@ -6,7 +6,7 @@
 #  from config.sh, placeholders swapped at the bottom.
 #
 #  Two differences from the daily, both deliberate:
-#   - It reads the week's seven daily editions first and builds from them,
+#   - It reads the week's daily editions first (Monday to Saturday: six), and
 #     so the Sunday paper is a record of what actually happened, not a fresh
 #     guess at the news.
 #   - No repeat check when publishing. A weekly is expected to revisit the
@@ -20,7 +20,7 @@ source ./config.sh
 read -r -d '' RAW_PROMPT <<'PROMPT' || true
 SUNDAY PAPER: Produce this week's Sunday Paper and publish it to the website. This is the weekend edition of {{PAPER}} - a longer, unhurried read than the daily, not a bigger daily. It is one edition per week.
 
-STAGE 1 - GATHER THE WEEK. Read the last seven daily editions in {{REPO}}/editions/ (the seven most recent YYYY-MM-DD.md files, not the -weekly ones). Those are your record of what actually happened this week - do not invent stories that were not in them, and do not repeat them verbatim either. Then search the web for the week's genuinely significant UK news that the dailies may have missed, and for one or two things that developed after a daily ran (a follow-up, a correction, a consequence), and include any {{PLACE}} story from the week that mattered beyond the county line or was under-reported locally (from BBC News {{TOWN}}/{{PLACE}}, the {{TOWN}} Telegraph or {{PLACE}} Live, with a real retrieved link).
+STAGE 1 - GATHER THE WEEK. Read this week's daily editions in {{REPO}}/editions/ - Monday to Saturday, the six most recent YYYY-MM-DD.md files, and never the -weekly ones. (There is no Sunday daily: Sunday's paper is the one you are writing.) Those are your record of what actually happened this week - do not invent stories that were not in them, and do not repeat them verbatim either. Then search the web for the week's genuinely significant UK news that the dailies may have missed, and for one or two things that developed after a daily ran (a follow-up, a correction, a consequence), and include any {{PLACE}} story from the week that mattered beyond the county line or was under-reported locally (from BBC News {{TOWN}}/{{PLACE}}, the {{TOWN}} Telegraph or {{PLACE}} Live, with a real retrieved link).
 
 STAGE 2 - WRITE IT. Write to {{REPO}}/editions/$(date -u +%F)-weekly.md with a heredoc. Shape:
 - H1: the single biggest story of the week as a headline, no date in it.

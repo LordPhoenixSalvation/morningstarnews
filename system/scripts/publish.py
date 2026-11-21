@@ -475,7 +475,7 @@ def shell(title, body, datestr="", is_home=False, extra_head="", url=None):
 <title>{html.escape(title)}</title>
 <meta name="description" content="{html.escape(PAPER)}: news, television, games, film and technology.">
 {og}
-<link rel="alternate" type="application/rss+xml" title="Morningstar News" href="{SITE}/feed.xml">
+<link rel="alternate" type="application/rss+xml" title="The Fenland Herald" href="{SITE}/feed.xml">
 <link rel="stylesheet" href="{SITE}/style.css?v={CSSV}">
 {extra_head}
 </head>
@@ -635,7 +635,7 @@ def main():
 
     body = build_body(md, date)
     title_m = re.search(r'^#\s+(.+)$', md, re.M)
-    title = title_m.group(1).strip() if title_m else "Morningstar News"
+    title = title_m.group(1).strip() if title_m else "The Fenland Herald"
 
     os.makedirs(f"{REPO}/posts", exist_ok=True)
     out_name = slug
@@ -652,7 +652,7 @@ def main():
     lsrc = f"{REPO}/editions/{latest}.md"
     lbody = build_body(open(lsrc, encoding="utf-8").read(), latest)
     ltitle_m = re.search(r'^#\s+(.+)$', lsrc and open(lsrc, encoding="utf-8").read(), re.M)
-    ltitle = ltitle_m.group(1).strip() if ltitle_m else "Morningstar News"
+    ltitle = ltitle_m.group(1).strip() if ltitle_m else "The Fenland Herald"
     weeklies = published_weeklies()
     wbanner = ""
     if weeklies:
@@ -662,7 +662,7 @@ def main():
                    f'The Sunday Paper &mdash; {html.escape(wtitle)}</a></p>')
         lbody = wbanner + lbody
     open(f"{REPO}/index.html", "w", encoding="utf-8").write(
-        shell(f"Morningstar News — {pretty_date(latest)}", lbody, pretty_date(latest), is_home=True))
+        shell(f"The Fenland Herald — {pretty_date(latest)}", lbody, pretty_date(latest), is_home=True))
     if weekly:
         # and the weekly page itself gets the banner pointing back
         pass
@@ -691,7 +691,7 @@ def main():
         chunks.append("</ol>")
     chunks.append(f'<p class="back"><a href="{SITE}/">&larr; Today&rsquo;s edition</a></p></div>')
     open(f"{REPO}/history.html", "w", encoding="utf-8").write(
-        shell("Archive — Morningstar News", "\n".join(chunks), "ARCHIVE"))
+        shell("Archive — The Fenland Herald", "\n".join(chunks), "ARCHIVE"))
 
     # RSS feed
     items = []
@@ -719,7 +719,7 @@ def main():
             "  </item>")
     feed = ('<?xml version="1.0" encoding="UTF-8"?>\n'
             '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">\n<channel>\n'
-            "  <title>Morningstar News</title>\n"
+            f"  <title>{html.escape(PAPER)}</title>\n"
             f"  <link>{SITE}/</link>\n"
             "  <description>UK news, Pokemon, Warhammer, Star Trek, AI, Android, macOS, Linux. Published daily.</description>\n"
             "  <language>en-gb</language>\n"
@@ -729,8 +729,17 @@ def main():
 
     r = subprocess.run('git add -A && git commit -q -m "Edition: ' + slug + '" && git push -q origin main',
                        shell=True, cwd=REPO, capture_output=True, text=True)
-    if r.returncode != 0 and "nothing to commit" not in (r.stdout + r.stderr):
-        print(r.stdout, r.stderr)
+    pushed = r.returncode == 0
+    if not pushed:
+        out = r.stdout + r.stderr
+        # "nothing to commit" only means this exact edition was already built.
+        pushed = "nothing to commit" in out
+        if not pushed:
+            print(out.strip(), file=sys.stderr)
+            print(f"The edition was built at {REPO}/posts/{out_name}.html but NOT "
+                  "pushed, so it is not live.\nFix the git remote or credentials, "
+                  "then run: cd " + REPO + " && git push origin main", file=sys.stderr)
+            sys.exit(1)
     print("Published:", f"{SITE}/posts/{out_name}.html")
 
 

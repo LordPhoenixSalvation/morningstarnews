@@ -13,15 +13,15 @@
 # JOBS_DIR = this folder: the scripts, the quote pool, the cache files.
 # REPO_DIR = the folder GitHub publishes from: editions/ and posts/ live here.
 JOBS_DIR="${JOBS_DIR:-/home/YOURNAME/jobs}"
-REPO_DIR="${REPO_DIR:-/home/YOURNAME/repo/morningstarnews}"
+REPO_DIR="${REPO_DIR:-/home/YOURNAME/repo/YOUR-REPO}"
 
 # --- The paper --------------------------------------------------------------
 # PAPER_NAME appears in the masthead and in email subject lines.
-PAPER_NAME="${PAPER_NAME:-Morningstar News}"
+PAPER_NAME="${PAPER_NAME:-The Fenland Herald}"
 
 # SITE_URL is where the paper is published. NO TRAILING SLASH.
 # The publisher writes this address into every page and every email link.
-SITE_URL="${SITE_URL:-https://lordphoenixsalvation.github.io/morningstarnews}"
+SITE_URL="${SITE_URL:-https://YOURNAME.github.io/YOUR-REPO}"
 
 # --- Who gets the email -----------------------------------------------------
 # Leave EMAIL_TO empty ("") to skip email entirely and just publish the paper.
@@ -29,18 +29,18 @@ EMAIL_TO="${EMAIL_TO:-you@example.com}"
 
 # --- Where you are ----------------------------------------------------------
 # Used by the weather block, the almanac and the satellite pass page.
-# PLACE_NAME        = how it appears in the paper ("Derbyshire", "Kent")
+# PLACE_NAME        = how it appears in the paper ("Cambridgeshire", "Kent")
 # PLACE_LAT/PLACE_LON = decimal degrees, used for sun, moon and satellite maths
 # BBC_WEATHER_ID    = BBC Weather's own location number. Find yours by visiting
 #                     bbc.co.uk/weather, searching your town, and reading the
-#                     number at the end of the address (/weather/2651347).
+#                     number at the end of the address (/weather/2655603).
 # RADIO_GRID        = your Maidenhead locator (amateur radio). Optional.
-PLACE_NAME="${PLACE_NAME:-Derbyshire}"
-PLACE_TOWN="${PLACE_TOWN:-Derby}"
-PLACE_LAT="${PLACE_LAT:-52.9219}"
-PLACE_LON="${PLACE_LON:--1.4756}"
-BBC_WEATHER_ID="${BBC_WEATHER_ID:-2651347}"
-RADIO_GRID="${RADIO_GRID:-IO92}"
+PLACE_NAME="${PLACE_NAME:-Cambridgeshire}"
+PLACE_TOWN="${PLACE_TOWN:-Cambridge}"
+PLACE_LAT="${PLACE_LAT:-52.2053}"
+PLACE_LON="${PLACE_LON:-0.1218}"
+BBC_WEATHER_ID="${BBC_WEATHER_ID:-2655603}"
+RADIO_GRID="${RADIO_GRID:-JO02}"
 
 # --- How the AI is called ---------------------------------------------------
 # run_agent.sh handles this. These describe HOW, not WHERE.
@@ -55,7 +55,8 @@ AGENT_ROTATE="${AGENT_ROTATE:-1}"
 AGENT_SPEAKER="${AGENT_SPEAKER:-rool}"
 
 # --- Timezone ---------------------------------------------------------------
-# The paper is dated in UTC so the date always matches the 08:00 cron time.
+# Dates and times in the paper are UTC, so a run never changes date mid-edition.
+# The cron line itself uses the machine's local clock.
 # Only change this if you move the cron job and know why.
 export TZ="${TZ:-UTC}"
 
