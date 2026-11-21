@@ -410,7 +410,14 @@ def build_body(md, date):
             txt = re.sub(r"^>[ \t]?", "", val, flags=re.M).strip()
             chunks = [c.strip() for c in re.split(r"\n\s*\n", txt) if c.strip()]
             inner = "".join(pandoc(c).strip() for c in chunks)
-            parts.append(f'<div class="forage">{inner}</div>')
+            # Only real forage output is styled as the forage box. Any other
+            # blockquote is a quote the author slipped in; the epigraph below
+            # is the paper's one curated quote, so render it plainly rather
+            # than dressing a duplicate up as script output.
+            if "in season" in txt.lower() or "thenas.org.uk" in txt:
+                parts.append(f'<div class="forage">{inner}</div>')
+            else:
+                parts.append(f'<blockquote class="stray-quote">{inner}</blockquote>')
         else:
             f = pandoc(val).strip()
             lead = re.sub(r'^(!\[[^\]]*\]\([^)]*\)\{[^}]*\})+', '', val).lstrip()
