@@ -1,6 +1,6 @@
 #!/bin/bash
 # ============================================================================
-#  newsletter.sh — the 08:00 daily paper
+#  newsletter.sh — the 08:00 daily paper, Monday to Saturday
 # ============================================================================
 #  This file is mostly one long instruction to an AI agent. Everything the
 #  paper gets right is written in that instruction, so read it before you

@@ -35,7 +35,7 @@ Two cron jobs:
 
 | When | Script | What |
 |---|---|---|
-| 08:00 daily | `newsletter.sh` | Researches and publishes the daily paper, emails a digest |
+| 08:00 Mon-Sat | `newsletter.sh` | Researches and publishes the daily paper, emails a digest |
 | 09:00 Sunday | `weekly.sh` | The Sunday Paper — longer, weekly, kept out of the daily archive |
 
 ## What the AI does, and what it doesn't

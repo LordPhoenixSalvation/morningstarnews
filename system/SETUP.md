@@ -357,13 +357,19 @@ crontab -e
 Choose nano if it asks. Add these two lines, with your own paths:
 
 ```
-0 8 * * *   /home/YOURNAME/jobs/newsletter.sh  # DAILY-NEWSLETTER
+0 8 * * 1-6 /home/YOURNAME/jobs/newsletter.sh  # DAILY-NEWSLETTER
 0 9 * * 0   /home/YOURNAME/jobs/weekly.sh      # WEEKLY-PAPER
 ```
 
-Read `0 8 * * *` as "minute 0, hour 8, every day, every month, every weekday".
-The second line is 9am on Sundays only. **Cron uses the machine's clock**, so if
-your computer is set to local time, 8 means 8am local. Check with `date`.
+Read `0 8 * * 1-6` as "minute 0, hour 8, Monday to Saturday, every month". The
+`1-6` matters: it is Monday to Saturday, so Sunday has no daily and the Sunday
+Paper is the only paper that day. The second line is 9am on Sundays only.
+
+If you keep the daily on Sunday as well (`0 8 * * *`) you get two papers and two
+emails, and the weekly reads Monday-to-Sunday rather than the week just gone.
+
+**Cron uses the machine's clock**, so if your computer is set to local time, 8
+means 8am local. Check with `date`.
 
 Test it without waiting a day:
 
@@ -378,7 +384,7 @@ Cron's output goes nowhere by default, which makes failures invisible. Wrap the
 job so it writes a log:
 
 ```
-0 8 * * *   /home/YOURNAME/jobs/newsletter.sh >> /home/YOURNAME/jobs/news.log 2>&1  # DAILY-NEWSLETTER
+0 8 * * 1-6 /home/YOURNAME/jobs/newsletter.sh >> /home/YOURNAME/jobs/news.log 2>&1  # DAILY-NEWSLETTER
 ```
 
 Now `news.log` is your record of every run. When something breaks at 8am while
@@ -466,6 +472,12 @@ Set `AGENT_ROTATE=0` if you would rather reuse a single conversation.
 `weekly.sh` reads the week's seven daily editions and writes a longer piece. It
 skips the repeat check on purpose — a weekly is meant to revisit the week. Either
 keep it, change it, or delete the cron line and have a daily only.
+
+With the daily running Monday to Saturday, those seven editions are exactly the
+week just gone: last Sunday's paper is not a daily, so the weekly starts clean on
+Monday and covers the seven days up to Saturday. Give the daily all seven days
+and the weekly would instead read Monday-to-Sunday, with Sunday's own daily half
+an hour old and duplicated in it.
 
 ---
 
