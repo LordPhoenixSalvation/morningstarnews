@@ -9,6 +9,9 @@ at a word limit, so the same information costs a few hundred tokens.
 
     python3 fetch.py <url> [<url> ...] [--words N]
 
+STATUS: not used by the prompt shipped in newsletter.sh. Kept as a working
+option for cutting run cost - see "Optional: cheaper runs" in SETUP.md.
+
 Fetch several pages in ONE call and separate them with a line of dashes. That
 matters more than it looks: every separate call re-sends the whole conversation
 to the model, so six URLs in one call can be a fifth of the cost of six calls.

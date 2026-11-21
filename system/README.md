@@ -23,8 +23,7 @@ cron ──► newsletter.sh ──► run_agent.sh ──► the AI
                                               ▼
                                         publish.py <date>
                                               │
-             weather.py + forage.py ──────────┤  injected at build time
-             digest.py ───────────────────────┤  builds the email body
+     weather.py + forage.py (run by the AI) ──┤  pasted into the edition
                                               │
                               editions/*.md ──► HTML + stylesheet + RSS
                                               │
@@ -89,14 +88,20 @@ follows, including the masthead, the email links and the almanac.
 | `run_agent.sh` | bash | Calls the AI. Swap the block inside to change provider |
 | `publish.py` | Python | Markdown → HTML, CSS, front page, archive, RSS, git push |
 | `recent.py` | Python | Prints the previous edition's headlines and sources |
-| `fetch.py` | Python | Fetches a page and returns only its article text, capped |
-| `digest.py` | Python | Builds the morning email from the finished edition |
+| `fetch.py` | Python | *Not used by the current prompt.* Fetches a page and returns only its article text, capped |
+| `digest.py` | Python | *Not used by the current prompt.* Builds the morning email from the finished edition |
 | `weather.py` | Python | The forecast, from the BBC feed |
 | `forage.py` | Python | Today's seasonal note |
 | `forage_guide.py` | Python | The Foraging Year — twelve monthly pages, 30-day cache |
 | `almanac.py` | Python | Sun and moon, warnings, river levels |
 | `radio.py` | Python | Satellite passes and space weather |
 | `quotes.json` | JSON | The quote pool the closing line is drawn from |
+
+`fetch.py` and `digest.py` ship in a working state but the shipped prompt does
+not call them: the AI reads pages directly and writes its own digest. They are
+published because they are the cheapest way to cut a paper's cost and worth
+trying yourself — see "Optional: cheaper runs" in the setup guide. Nothing breaks
+if you never touch them.
 
 Every function in the Python files has a docstring saying what it is for. The
 two shell scripts that carry the prompts explain at the top what each stage does

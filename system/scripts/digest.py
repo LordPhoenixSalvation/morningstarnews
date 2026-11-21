@@ -7,6 +7,9 @@ headlines, each linking straight to the section it appears in.
 
     python3 digest.py [YYYY-MM-DD]
 
+STATUS: not used by the prompt shipped in newsletter.sh. Kept as a working
+option for cutting run cost - see "Optional: cheaper runs" in SETUP.md.
+
 Prints a complete email body to stdout, ready to hand to send_email. Building
 it from the edition file rather than by retyping it means the links and the
 section anchors are always right.

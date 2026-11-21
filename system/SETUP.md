@@ -256,18 +256,7 @@ python3 weather.py     # should print a forecast line and a BBC link
 python3 forage.py      # should print what's in season
 python3 almanac.py     # should print "almanac written"
 python3 radio.py       # should print "radio written" and a number of passes
-python3 fetch.py https://www.bbc.co.uk/news 300   # should print a title and trimmed text
-python3 fetch.py https://www.bbc.co.uk/news https://www.bbc.co.uk/sport --words 200   # several at once
-python3 digest.py 2026-01-01                      # needs an edition file to exist first
 ```
-
-The last two are worth a word. `fetch.py` is how the AI reads a web page: given a
-URL it returns the title and the article text with menus, ads and cookie banners
-stripped, cut at a word limit. Reading a page raw costs about ten times as much
-for the same sentences, which is most of the difference between a cheap paper and
-an expensive one. Passing several URLs to one call matters for the same reason:
-ten separate calls re-send the conversation ten times. `digest.py` builds the morning email from a finished edition, so
-the links and section anchors are never retyped by hand.
 
 If all four print something sensible, the hardest half is done. The page
 `almanac.html` and `radio.html` should now exist in your repo folder.
@@ -442,21 +431,23 @@ items with fresh ones.
 
 Worth knowing, because it is what keeps a paper cheap:
 
-- **The weather and the foraging note are added by the publisher**, not by the AI.
-  They come from `weather.py` and `forage.py` and are injected when the page is
-  built. The instruction tells the AI to leave them alone, and if you ever see a
-  forecast in an edition file, something has gone wrong — a model-written forecast
-  is the one thing this system must never produce.
+- **The weather and the foraging note are collected by the AI, not written by it.**
+  The instruction tells it to run `weather.py` and `forage.py` and paste the
+  output in verbatim. It never invents a forecast — a model-written forecast is
+  the one thing this system must never produce.
 - **The reference pages** (Almanac, Radio, Foraging Year) are rebuilt before the
   AI is even called.
-- **The digest** is generated from the edition file by `digest.py`.
+- **The closing quote is added by the publisher** from `quotes.json`. The
+  instruction tells the AI to stop at its closing observation and write no
+  quotation of its own, so an edition has exactly one epigraph.
 
 That leaves the AI doing only what needs judgement: searching, choosing, and
 writing.
 
 ### One conversation per edition
 
-`config.sh` sets `AGENT_ROTATE=1`, which gives each run a brand-new conversation.
+`config.sh` ships with `AGENT_ROTATE=0`, so every run reuses one conversation. Set
+it to `1` and each run gets a brand-new conversation instead.
 That matters more than it sounds. Append eighty editions to one conversation and
 every morning's run sits on top of an archive it will never read. Rotating keeps
 each run to that morning's work; old conversations stay on disk if you want to
@@ -478,6 +469,47 @@ week just gone: last Sunday's paper is not a daily, so the weekly starts clean o
 Monday and covers the seven days up to Saturday. Give the daily all seven days
 and the weekly would instead read Monday-to-Sunday, with Sunday's own daily half
 an hour old and duplicated in it.
+
+### Optional: cheaper runs
+
+Two scripts ship in a working state that the prompt does not call. Neither is
+broken and neither is needed to get a paper out; they are here because they are
+the two obvious ways to spend fewer credits, and they are worth a try once your
+paper is running.
+
+**`fetch.py` — read pages more cheaply.** The AI can read a web page directly,
+but a raw page carries menus, adverts and cookie banners, and you pay for all of
+it. `fetch.py` returns the title and the article text, cut at a word limit, and
+takes several URLs in one call:
+
+```bash
+python3 fetch.py https://www.bbc.co.uk/news --words 300
+python3 fetch.py https://www.bbc.co.uk/news https://www.bbc.co.uk/sport --words 200
+```
+
+To use it, add a line to the instruction in `newsletter.sh` telling the AI to
+read pages with `fetch.py` rather than directly, and to pass several URLs per
+call.
+
+**`digest.py` — build the email from the finished edition.** The shipped prompt
+has the AI write the digest itself, which is one more model call. `digest.py`
+takes a published edition and returns the subject and body, so the email can be
+sent by shell afterwards with no AI involved:
+
+```bash
+python3 digest.py 2026-01-01
+```
+
+Either change is small, but **change one thing at a time and measure it.** The
+number that matters is not how many calls a run makes, it is the total size of
+the conversation, because every turn re-sends everything before it. A run that
+makes half as many calls but carries twice the text per call costs more, not
+less. This paper's own history is the warning: a round of changes cut the turns
+from 34 to 11 and made the edition ten times more expensive, because each turn
+was carrying eight fat search results instead of two. It was reverted. Fewer,
+smaller turns is the goal; fewer turns alone is not.
+
+Set `AGENT_ROTATE=1` too if you expect to run for months — see above.
 
 ---
 
@@ -540,9 +572,10 @@ correct.
 
 The scripts cost nothing to run: a few web requests a day.
 
-The AI is the only real cost. Roughly, one edition of this paper is 15-20 model
-calls with web search, which on a metered service is pennies rather than pounds.
-This one runs at about €0.07 an edition. Check your provider's pricing before
+The AI is the only real cost. This one runs at roughly 50 credits an edition on
+Rool, which is about €0.07. On a metered provider expect 8-10 model calls with
+web search per edition — pennies rather than pounds, but search-heavy work costs
+more than chat because every fetched page goes into the conversation. Check your provider's pricing before
 committing — search-heavy work uses more tokens than chat because every fetched
 page goes into the context.
 
