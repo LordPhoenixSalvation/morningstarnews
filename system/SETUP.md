@@ -492,9 +492,17 @@ them, and publish again.
 **A section is empty or missing.**
 Also working as intended. The instruction says omit rather than pad.
 
-**An edition file has no weather block.** The publisher adds it at build time. If
-`weather.py` fails it prints a note and the paper goes out without the strip, which
-is correct behaviour — better no forecast than an invented one.
+**An edition file has no weather block.** The AI runs `weather.py` during the job
+and pastes its output in, so a missing strip means the script printed nothing or the
+step was skipped. If `weather.py` fails, the paper goes out without the strip, which
+is correct behaviour — better no forecast than an invented one. Check the edition
+file: a standfirst followed straight by a `## ` heading is the tell.
+
+**The closing quote appears twice.** The publisher appends it from `quotes.json`, so
+the instruction must never ask for one too. Both `newsletter.sh` and `weekly.sh` say
+so explicitly, and any blockquote that isn't real forage output renders unstyled as
+`stray-quote` so you can see it. Delete the quote from the edition file and publish
+again.
 
 **`weather.py` prints nothing.**
 The BBC feed changed or is down. The paper will run without a weather block —

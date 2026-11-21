@@ -32,7 +32,12 @@ STAGE 2 - WRITE IT. Write to {{REPO}}/editions/$(date -u +%F)-weekly.md with a h
 - A closing observation of two or three sentences, longer and more reflective than the daily's one-liner.
 Tone: the same dry British newspaper voice as the daily, but with room to breathe - proper sentences, developed argument, no bullet-point padding. Every factual claim from outside the dailies needs a real retrieved source link. If you have not verified it, leave it out. Put {{xkcd:NUMBER}} on its own line about a third of the way in if a comic genuinely fits.
 
-STAGE 3 - QUOTE, WEATHER, FORAGING. Write the closing quote in as usual. Leave the weather and the foraging note alone: the publisher adds both from the scripts when it builds the page. Do not run those scripts and do not write a forecast yourself.
+STAGE 3 - NO QUOTE, BUT PULL WEATHER AND FORAGING. Do NOT write a closing quotation, epigraph or attribution, and do not start any line with '>': the publisher appends the curated quote from quotes.json automatically, so a quote written here appears twice at the foot of the page. Two pieces of the paper ARE script output and you must reproduce them exactly, character for character - do not paraphrase, summarise, tidy, "improve" or invent any of it, and never write a forecast or a foraging note yourself. The foraging block is the ONLY blockquote anywhere in the edition.
+  Run: python3 {{JOBS}}/weather.py
+  If it prints, insert that output in full immediately after the standfirst line, before the first section heading. If it prints nothing (it exits non-zero when the BBC feed is down), OMIT the weather block entirely rather than writing your own.
+  Run: python3 {{JOBS}}/forage.py
+  If it prints, insert that output in full as the very last thing in the file, after the closing observation. If it prints nothing, omit it.
+Do not edit the scripts, their output, or the links they contain.
 
 STAGE 4 - PUBLISH. Run: cd {{REPO}} && python3 {{JOBS}}/publish.py $(date -u +%F)-weekly and confirm it prints the published URL. It will also put a 'Sunday Paper' link at the top of the front page and in the archive. Do not let the weekly replace the front page's daily edition.
 
