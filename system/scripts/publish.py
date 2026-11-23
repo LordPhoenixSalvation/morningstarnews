@@ -288,6 +288,16 @@ def drop_empty_sections(md):
 
 def para_items(md, date):
     """Split body into blocks; attach images to paragraphs that contain links."""
+    # A blockquote must start its own block. If the author ran the closing
+    # observation straight into the foraging note with no blank line between
+    # them, the whole thing parses as one paragraph and the '>' markers leak
+    # into the page as visible "&gt;". Force a blank line before any line that
+    # starts a quote run.
+    while True:
+        fixed = re.sub(r'(?m)^([^\n>].*)\n(>)', r'\1\n\n\2', md)
+        if fixed == md:
+            break
+        md = fixed
     blocks = re.split(r'\n\s*\n', md)
     out = []
     cache = {}
